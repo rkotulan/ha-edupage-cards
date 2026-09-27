@@ -146,7 +146,6 @@ export class EdupageTimetableCard extends LitElement {
     const today = dateKey(this.now, this.hass.config.time_zone);
     const lastDay = addDays(today, (this.config.available_days ?? 14) - 1);
     const people = students(this.config);
-    const chosen = people[this.studentIndex];
     const studentName = (index: number) => String(people[index].name ?? this.hass!.states[people[index].entity]?.attributes.friendly_name ?? people[index].entity);
     const count = this.config.show_weekend ? 7 : 5;
     const days = Array.from({ length: count }, (_, i) => addDays(this.week, i));
@@ -184,7 +183,10 @@ export class EdupageTimetableCard extends LitElement {
             </button>`)}
           </div>
         </details>`
-          : html`<span class="badge">${chosen.name ?? this.hass.states[chosen.entity]?.attributes.friendly_name ?? chosen.entity}</span>`}
+          : html`<div class="student-static">
+              <span class="student-avatar" aria-hidden="true">${studentName(this.studentIndex).trim().slice(0, 1).toLocaleUpperCase()}</span>
+              <span class="student-name">${studentName(this.studentIndex)}</span>
+            </div>`}
       </div>
       </div>
       ${this.calendar.loading ? html`<div class="message" role="status">${this.t('Načítám rozvrh…', 'Loading timetable…')}</div>`

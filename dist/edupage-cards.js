@@ -29,11 +29,11 @@ var e = globalThis, t = e.ShadowRoot && (e.ShadyCSS === void 0 || e.ShadyCSS.nat
 	let t = "";
 	for (let n of e.cssRules) t += n.cssText;
 	return a(t);
-})(e) : e, { is: l, defineProperty: u, getOwnPropertyDescriptor: d, getOwnPropertyNames: f, getOwnPropertySymbols: p, getPrototypeOf: ee } = Object, m = globalThis, h = m.trustedTypes, te = h ? h.emptyScript : "", ne = m.reactiveElementPolyfillSupport, g = (e, t) => e, _ = {
+})(e) : e, { is: l, defineProperty: u, getOwnPropertyDescriptor: d, getOwnPropertyNames: f, getOwnPropertySymbols: ee, getPrototypeOf: te } = Object, p = globalThis, m = p.trustedTypes, ne = m ? m.emptyScript : "", re = p.reactiveElementPolyfillSupport, h = (e, t) => e, g = {
 	toAttribute(e, t) {
 		switch (t) {
 			case Boolean:
-				e = e ? te : null;
+				e = e ? ne : null;
 				break;
 			case Object:
 			case Array: e = e == null ? e : JSON.stringify(e);
@@ -58,23 +58,23 @@ var e = globalThis, t = e.ShadowRoot && (e.ShadyCSS === void 0 || e.ShadyCSS.nat
 		}
 		return n;
 	}
-}, v = (e, t) => !l(e, t), y = {
+}, _ = (e, t) => !l(e, t), v = {
 	attribute: !0,
 	type: String,
-	converter: _,
+	converter: g,
 	reflect: !1,
 	useDefault: !1,
-	hasChanged: v
+	hasChanged: _
 };
-Symbol.metadata ??= Symbol("metadata"), m.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
-var b = class extends HTMLElement {
+Symbol.metadata ??= Symbol("metadata"), p.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
+var y = class extends HTMLElement {
 	static addInitializer(e) {
 		this._$Ei(), (this.l ??= []).push(e);
 	}
 	static get observedAttributes() {
 		return this.finalize(), this._$Eh && [...this._$Eh.keys()];
 	}
-	static createProperty(e, t = y) {
+	static createProperty(e, t = v) {
 		if (t.state && (t.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(e) && ((t = Object.create(t)).wrapped = !0), this.elementProperties.set(e, t), !t.noAccessor) {
 			let n = Symbol(), r = this.getPropertyDescriptor(e, n, t);
 			r !== void 0 && u(this.prototype, e, r);
@@ -100,17 +100,17 @@ var b = class extends HTMLElement {
 		};
 	}
 	static getPropertyOptions(e) {
-		return this.elementProperties.get(e) ?? y;
+		return this.elementProperties.get(e) ?? v;
 	}
 	static _$Ei() {
-		if (this.hasOwnProperty(g("elementProperties"))) return;
-		let e = ee(this);
+		if (this.hasOwnProperty(h("elementProperties"))) return;
+		let e = te(this);
 		e.finalize(), e.l !== void 0 && (this.l = [...e.l]), this.elementProperties = new Map(e.elementProperties);
 	}
 	static finalize() {
-		if (this.hasOwnProperty(g("finalized"))) return;
-		if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(g("properties"))) {
-			let e = this.properties, t = [...f(e), ...p(e)];
+		if (this.hasOwnProperty(h("finalized"))) return;
+		if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(h("properties"))) {
+			let e = this.properties, t = [...f(e), ...ee(e)];
 			for (let n of t) this.createProperty(n, e[n]);
 		}
 		let e = this[Symbol.metadata];
@@ -171,14 +171,14 @@ var b = class extends HTMLElement {
 	_$ET(e, t) {
 		let n = this.constructor.elementProperties.get(e), r = this.constructor._$Eu(e, n);
 		if (r !== void 0 && !0 === n.reflect) {
-			let i = (n.converter?.toAttribute === void 0 ? _ : n.converter).toAttribute(t, n.type);
+			let i = (n.converter?.toAttribute === void 0 ? g : n.converter).toAttribute(t, n.type);
 			this._$Em = e, i == null ? this.removeAttribute(r) : this.setAttribute(r, i), this._$Em = null;
 		}
 	}
 	_$AK(e, t) {
 		let n = this.constructor, r = n._$Eh.get(e);
 		if (r !== void 0 && this._$Em !== r) {
-			let e = n.getPropertyOptions(r), i = typeof e.converter == "function" ? { fromAttribute: e.converter } : e.converter?.fromAttribute === void 0 ? _ : e.converter;
+			let e = n.getPropertyOptions(r), i = typeof e.converter == "function" ? { fromAttribute: e.converter } : e.converter?.fromAttribute === void 0 ? g : e.converter;
 			this._$Em = r;
 			let a = i.fromAttribute(t, e.type);
 			this[r] = a ?? this._$Ej?.get(r) ?? a, this._$Em = null;
@@ -187,7 +187,7 @@ var b = class extends HTMLElement {
 	requestUpdate(e, t, n, r = !1, i) {
 		if (e !== void 0) {
 			let a = this.constructor;
-			if (!1 === r && (i = this[e]), n ??= a.getPropertyOptions(e), !((n.hasChanged ?? v)(i, t) || n.useDefault && n.reflect && i === this._$Ej?.get(e) && !this.hasAttribute(a._$Eu(e, n)))) return;
+			if (!1 === r && (i = this[e]), n ??= a.getPropertyOptions(e), !((n.hasChanged ?? _)(i, t) || n.useDefault && n.reflect && i === this._$Ej?.get(e) && !this.hasAttribute(a._$Eu(e, n)))) return;
 			this.C(e, t, n);
 		}
 		!1 === this.isUpdatePending && (this._$ES = this._$EP());
@@ -251,17 +251,17 @@ var b = class extends HTMLElement {
 	updated(e) {}
 	firstUpdated(e) {}
 };
-b.elementStyles = [], b.shadowRootOptions = { mode: "open" }, b[g("elementProperties")] = /* @__PURE__ */ new Map(), b[g("finalized")] = /* @__PURE__ */ new Map(), ne?.({ ReactiveElement: b }), (m.reactiveElementVersions ??= []).push("2.1.2");
+y.elementStyles = [], y.shadowRootOptions = { mode: "open" }, y[h("elementProperties")] = /* @__PURE__ */ new Map(), y[h("finalized")] = /* @__PURE__ */ new Map(), re?.({ ReactiveElement: y }), (p.reactiveElementVersions ??= []).push("2.1.2");
 //#endregion
 //#region node_modules/lit-html/lit-html.js
-var x = globalThis, S = (e) => e, C = x.trustedTypes, w = C ? C.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, re = "$lit$", T = `lit$${Math.random().toFixed(9).slice(2)}$`, E = "?" + T, ie = `<${E}>`, D = document, O = () => D.createComment(""), k = (e) => e === null || typeof e != "object" && typeof e != "function", A = Array.isArray, ae = (e) => A(e) || typeof e?.[Symbol.iterator] == "function", j = "[ 	\n\f\r]", M = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, N = /-->/g, P = />/g, F = RegExp(`>|${j}(?:([^\\s"'>=/]+)(${j}*=${j}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`, "g"), oe = /'/g, se = /"/g, I = /^(?:script|style|textarea|title)$/i, L = ((e) => (t, ...n) => ({
+var b = globalThis, x = (e) => e, S = b.trustedTypes, C = S ? S.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, w = "$lit$", T = `lit$${Math.random().toFixed(9).slice(2)}$`, E = "?" + T, ie = `<${E}>`, D = document, O = () => D.createComment(""), k = (e) => e === null || typeof e != "object" && typeof e != "function", A = Array.isArray, ae = (e) => A(e) || typeof e?.[Symbol.iterator] == "function", j = "[ 	\n\f\r]", M = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, N = /-->/g, P = />/g, F = RegExp(`>|${j}(?:([^\\s"'>=/]+)(${j}*=${j}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`, "g"), oe = /'/g, se = /"/g, I = /^(?:script|style|textarea|title)$/i, L = ((e) => (t, ...n) => ({
 	_$litType$: e,
 	strings: t,
 	values: n
 }))(1), R = Symbol.for("lit-noChange"), z = Symbol.for("lit-nothing"), B = /* @__PURE__ */ new WeakMap(), V = D.createTreeWalker(D, 129);
 function H(e, t) {
 	if (!A(e) || !e.hasOwnProperty("raw")) throw Error("invalid template strings array");
-	return w === void 0 ? t : w.createHTML(t);
+	return C === void 0 ? t : C.createHTML(t);
 }
 var ce = (e, t) => {
 	let n = e.length - 1, r = [], i, a = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", o = M;
@@ -269,7 +269,7 @@ var ce = (e, t) => {
 		let n = e[t], s, c, l = -1, u = 0;
 		for (; u < n.length && (o.lastIndex = u, c = o.exec(n), c !== null);) u = o.lastIndex, o === M ? c[1] === "!--" ? o = N : c[1] === void 0 ? c[2] === void 0 ? c[3] !== void 0 && (o = F) : (I.test(c[2]) && (i = RegExp("</" + c[2], "g")), o = F) : o = P : o === F ? c[0] === ">" ? (o = i ?? M, l = -1) : c[1] === void 0 ? l = -2 : (l = o.lastIndex - c[2].length, s = c[1], o = c[3] === void 0 ? F : c[3] === "\"" ? se : oe) : o === se || o === oe ? o = F : o === N || o === P ? o = M : (o = F, i = void 0);
 		let d = o === F && e[t + 1].startsWith("/>") ? " " : "";
-		a += o === M ? n + ie : l >= 0 ? (r.push(s), n.slice(0, l) + re + n.slice(l) + T + d) : n + T + (l === -2 ? t : d);
+		a += o === M ? n + ie : l >= 0 ? (r.push(s), n.slice(0, l) + w + n.slice(l) + T + d) : n + T + (l === -2 ? t : d);
 	}
 	return [H(e, a + (e[n] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), r];
 }, U = class e {
@@ -283,7 +283,7 @@ var ce = (e, t) => {
 		}
 		for (; (i = V.nextNode()) !== null && c.length < s;) {
 			if (i.nodeType === 1) {
-				if (i.hasAttributes()) for (let e of i.getAttributeNames()) if (e.endsWith(re)) {
+				if (i.hasAttributes()) for (let e of i.getAttributeNames()) if (e.endsWith(w)) {
 					let t = u[o++], n = i.getAttribute(e).split(T), r = /([.?@])?(.*)/.exec(t);
 					c.push({
 						type: 1,
@@ -299,7 +299,7 @@ var ce = (e, t) => {
 				if (I.test(i.tagName)) {
 					let e = i.textContent.split(T), t = e.length - 1;
 					if (t > 0) {
-						i.textContent = C ? C.emptyScript : "";
+						i.textContent = S ? S.emptyScript : "";
 						for (let n = 0; n < t; n++) i.append(e[n], O()), V.nextNode(), c.push({
 							type: 2,
 							index: ++a
@@ -409,8 +409,8 @@ var le = class {
 	}
 	_$AR(e = this._$AA.nextSibling, t) {
 		for (this._$AP?.(!1, !0, t); e !== this._$AB;) {
-			let t = S(e).nextSibling;
-			S(e).remove(), e = t;
+			let t = x(e).nextSibling;
+			x(e).remove(), e = t;
 		}
 	}
 	setConnected(e) {
@@ -474,8 +474,8 @@ var le = class {
 	_$AI(e) {
 		W(this, e);
 	}
-}, me = x.litHtmlPolyfillSupport;
-me?.(U, G), (x.litHtmlVersions ??= []).push("3.3.3");
+}, me = b.litHtmlPolyfillSupport;
+me?.(U, G), (b.litHtmlVersions ??= []).push("3.3.3");
 var he = (e, t, n) => {
 	let r = n?.renderBefore ?? t, i = r._$litPart$;
 	if (i === void 0) {
@@ -483,7 +483,7 @@ var he = (e, t, n) => {
 		r._$litPart$ = i = new G(t.insertBefore(O(), e), e, void 0, n ?? {});
 	}
 	return i._$AI(e), i;
-}, q = globalThis, J = class extends b {
+}, q = globalThis, J = class extends y {
 	constructor() {
 		super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
 	}
@@ -661,12 +661,14 @@ var we = class {
   .eyebrow { font-size: 10px; letter-spacing: .16em; font-weight: 700; color: var(--secondary-text-color, #687987); margin-bottom: 5px; }
   h2 { font-size: 23px; letter-spacing: -.03em; line-height: 1.2; margin: 0; font-weight: 650; }
   .student-picker { position: relative; max-width: 100%; font-size: 14px; }
-  .student-picker summary { display: flex; align-items: center; gap: 10px; list-style: none; cursor: pointer; min-height: 46px; padding: 6px 12px 6px 8px; border: 1px solid var(--divider-color, #d9e1e6); border-radius: 14px; background: var(--secondary-background-color, #f6f8fa); }
+  .student-picker summary, .student-static { display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 6px 12px 6px 8px; border: 1px solid var(--divider-color, #d9e1e6); border-radius: 14px; background: var(--secondary-background-color, #f6f8fa); }
+  .student-picker summary { list-style: none; cursor: pointer; }
+  .student-static { max-width: 100%; min-width: 0; font-size: 14px; }
   .student-picker summary::-webkit-details-marker { display: none; }
   .student-picker summary:hover, .student-picker[open] summary { border-color: color-mix(in srgb, var(--primary-color, #007b83) 55%, var(--divider-color, #d9e1e6)); }
   .student-avatar { display: grid; place-items: center; flex: 0 0 30px; width: 30px; height: 30px; border-radius: 10px; background: color-mix(in srgb, var(--primary-color, #007b83) 14%, transparent); color: var(--primary-color, #007b83); font-weight: 700; font-size: 13px; }
   .student-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
-  summary .student-name { max-width: 180px; font-weight: 600; }
+  summary .student-name, .student-static .student-name { max-width: 180px; font-weight: 600; }
   .student-chevron { width: 18px; height: 18px; flex: 0 0 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; opacity: .65; }
   .student-picker[open] .student-chevron { transform: rotate(180deg); }
   .student-options { position: absolute; top: calc(100% + 8px); right: 0; z-index: 20; width: max(100%, 220px); max-width: calc(100vw - 40px); max-height: 300px; overflow-y: auto; padding: 7px; border: 1px solid var(--divider-color, #d9e1e6); border-radius: 16px; background: var(--ha-card-background, var(--card-background-color, #fff)); box-shadow: 0 12px 32px #0003; }
@@ -683,7 +685,6 @@ var we = class {
   .arrow { font-size: 19px; line-height: 20px; }
   .range { font-size: 14px; font-weight: 600; }
   .muted, footer { color: var(--secondary-text-color, #687987); }
-  .badge { font-size: 11px; background: var(--secondary-background-color, #f0f5f6); border-radius: 6px; padding: 5px 8px; overflow-wrap: anywhere; min-width: 0; }
   .desktop { overflow-x: auto; padding: 0 20px 12px; }
   .grid { min-width: 800px; }
   .row { display: grid; grid-template-columns: 70px 1fr; border-top: 1px solid var(--divider-color, #e7edf0); }
@@ -895,16 +896,16 @@ var Oe = class extends J {
 	}
 	render() {
 		if (!this.config || !this.hass || !this.week) return z;
-		let e = Y(this.now, this.hass.config.time_zone), t = X(e, (this.config.available_days ?? 14) - 1), n = $(this.config), r = n[this.studentIndex], i = (e) => String(n[e].name ?? this.hass.states[n[e].entity]?.attributes.friendly_name ?? n[e].entity), a = this.config.show_weekend ? 7 : 5, o = Array.from({ length: a }, (e, t) => X(this.week, t)), s = (n) => n >= e && n <= t, c = be(this.calendar.events, this.week, this.hass.config.time_zone).filter((e) => s(e.day)), { start: l, end: u } = Ce(c), d = Array.from({ length: (u - l) / 60 + 1 }, (e, t) => l + t * 60), f = (e) => s(e) ? this.t("Kalendář nevrátil žádné události.", "The calendar returned no events.") : this.t("Mimo dostupný rozsah konektoru.", "Outside the integration’s available range."), p = (e) => c.filter((t) => t.day === e);
+		let e = Y(this.now, this.hass.config.time_zone), t = X(e, (this.config.available_days ?? 14) - 1), n = $(this.config), r = (e) => String(n[e].name ?? this.hass.states[n[e].entity]?.attributes.friendly_name ?? n[e].entity), i = this.config.show_weekend ? 7 : 5, a = Array.from({ length: i }, (e, t) => X(this.week, t)), o = (n) => n >= e && n <= t, s = be(this.calendar.events, this.week, this.hass.config.time_zone).filter((e) => o(e.day)), { start: c, end: l } = Ce(s), u = Array.from({ length: (l - c) / 60 + 1 }, (e, t) => c + t * 60), d = (e) => o(e) ? this.t("Kalendář nevrátil žádné události.", "The calendar returned no events.") : this.t("Mimo dostupný rozsah konektoru.", "Outside the integration’s available range."), f = (e) => s.filter((t) => t.day === e);
 		return L`<ha-card>
       ${this.config.show_title ? L`<h2 class="card-title">${this.config.title ?? this.t("Rozvrh", "Timetable")}</h2>` : z}
       <div class="toolbar">
-        <div class="navigation"><button class="tool arrow" aria-label=${this.t("Předchozí týden", "Previous week")} ?disabled=${X(this.week, a - 8) < e} @click=${() => this.move(-1)}>‹</button>
+        <div class="navigation"><button class="tool arrow" aria-label=${this.t("Předchozí týden", "Previous week")} ?disabled=${X(this.week, i - 8) < e} @click=${() => this.move(-1)}>‹</button>
           <button class="tool" @click=${() => {
 			this.week = "", this.detail = void 0;
 		}}>${this.t("Dnes", "Today")}</button>
           <button class="tool arrow" aria-label=${this.t("Další týden", "Next week")} ?disabled=${X(this.week, 7) > t} @click=${() => this.move(1)}>›</button></div>
-        <div class="period-controls"><span class="range">${this.format(this.week)} – ${this.format(X(this.week, a - 1))} <span class="muted">${this.week.slice(0, 4)}</span></span>
+        <div class="period-controls"><span class="range">${this.format(this.week)} – ${this.format(X(this.week, i - 1))} <span class="muted">${this.week.slice(0, 4)}</span></span>
         <button class="tool refresh" aria-label=${this.t("Obnovit rozvrh", "Refresh timetable")} @click=${() => {
 			this.detail = void 0, this.calendar.refresh();
 		}}>↻</button>
@@ -914,9 +915,9 @@ var Oe = class extends J {
           @focusout=${(e) => {
 			e.currentTarget.contains(e.relatedTarget) || this.closeStudentPicker();
 		}}>
-          <summary aria-label=${`${this.t("Vybrat dítě", "Choose student")}: ${i(this.studentIndex)}`}>
-            <span class="student-avatar" aria-hidden="true">${i(this.studentIndex).trim().slice(0, 1).toLocaleUpperCase()}</span>
-            <span class="student-name">${i(this.studentIndex)}</span>
+          <summary aria-label=${`${this.t("Vybrat dítě", "Choose student")}: ${r(this.studentIndex)}`}>
+            <span class="student-avatar" aria-hidden="true">${r(this.studentIndex).trim().slice(0, 1).toLocaleUpperCase()}</span>
+            <span class="student-name">${r(this.studentIndex)}</span>
             <svg class="student-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5" /></svg>
           </summary>
           <div class="student-options" role="group" aria-label=${this.t("Dítě", "Student")}>
@@ -925,29 +926,32 @@ var Oe = class extends J {
               @click=${() => {
 			this.studentIndex = t, this.detail = void 0, this.closeStudentPicker(!0);
 		}}>
-              <span class="student-avatar" aria-hidden="true">${i(t).trim().slice(0, 1).toLocaleUpperCase()}</span>
-              <span class="student-name">${i(t)}</span><span class="student-check" aria-hidden="true">${t === this.studentIndex ? "✓" : ""}</span>
+              <span class="student-avatar" aria-hidden="true">${r(t).trim().slice(0, 1).toLocaleUpperCase()}</span>
+              <span class="student-name">${r(t)}</span><span class="student-check" aria-hidden="true">${t === this.studentIndex ? "✓" : ""}</span>
             </button>`)}
           </div>
-        </details>` : L`<span class="badge">${r.name ?? this.hass.states[r.entity]?.attributes.friendly_name ?? r.entity}</span>`}
+        </details>` : L`<div class="student-static">
+              <span class="student-avatar" aria-hidden="true">${r(this.studentIndex).trim().slice(0, 1).toLocaleUpperCase()}</span>
+              <span class="student-name">${r(this.studentIndex)}</span>
+            </div>`}
       </div>
       </div>
       ${this.calendar.loading ? L`<div class="message" role="status">${this.t("Načítám rozvrh…", "Loading timetable…")}</div>` : this.calendar.error ? L`<div class="message" role="alert">${this.t("Rozvrh se nepodařilo načíst. Zkontrolujte dostupnost kalendáře v HA.", "Could not load the timetable. Check that the calendar is available in HA.")}<br><button class="tool" @click=${() => void this.calendar.refresh()}>${this.t("Zkusit znovu", "Try again")}</button></div>` : L`<div class="desktop"><div class="grid">
-          <div class="axis">${d.map((e) => L`<span class="tick" style=${`left:${(e - l) / (u - l) * 100}%`}>${Q(e)}</span>`)}</div>
-          ${o.map((t) => {
-			let n = p(t), r = xe(n.filter((e) => !e.allDay));
+          <div class="axis">${u.map((e) => L`<span class="tick" style=${`left:${(e - c) / (l - c) * 100}%`}>${Q(e)}</span>`)}</div>
+          ${a.map((t) => {
+			let n = f(t), r = xe(n.filter((e) => !e.allDay));
 			return L`
-            <div class="row ${t === e ? "today" : ""} ${s(t) ? "" : "outside"}">
+            <div class="row ${t === e ? "today" : ""} ${o(t) ? "" : "outside"}">
               <div class="day-label"><strong>${this.format(t, !0)}</strong><span>${this.format(t)}</span></div>
-              <div class="day-content">${n.filter((e) => e.allDay).map((t) => this.lesson(t, l, u, e))}
-                ${r.lessons.length ? L`<div class="track" style=${`height:calc(${r.lanes} * var(--lane-height) + 8px);--hour-width:${60 / (u - l) * 100}%`}>${r.lessons.map((t) => this.lesson(t, l, u, e))}</div>` : n.length ? z : L`<div class="empty">${f(t)}</div>`}</div>
+              <div class="day-content">${n.filter((e) => e.allDay).map((t) => this.lesson(t, c, l, e))}
+                ${r.lessons.length ? L`<div class="track" style=${`height:calc(${r.lanes} * var(--lane-height) + 8px);--hour-width:${60 / (l - c) * 100}%`}>${r.lessons.map((t) => this.lesson(t, c, l, e))}</div>` : n.length ? z : L`<div class="empty">${d(t)}</div>`}</div>
             </div>`;
 		})}
         </div></div>
-        <div class="mobile"><div class="days">${o.map((e, t) => L`<button aria-pressed=${t === this.selectedDay} @click=${() => {
+        <div class="mobile"><div class="days">${a.map((e, t) => L`<button aria-pressed=${t === this.selectedDay} @click=${() => {
 			this.selectedDay = t, this.detail = void 0;
 		}}>${this.format(e, !0)}<span>${this.format(e)}</span></button>`)}</div>
-          ${p(o[this.selectedDay]).length ? p(o[this.selectedDay]).map((t) => this.lesson(t, l, u, e)) : L`<div class="empty">${f(o[this.selectedDay])}</div>`}
+          ${f(a[this.selectedDay]).length ? f(a[this.selectedDay]).map((t) => this.lesson(t, c, l, e)) : L`<div class="empty">${d(a[this.selectedDay])}</div>`}
         </div>`}
       ${this.detail ? L`<dialog class="detail" aria-labelledby="lesson-detail-title"
         style=${`--detail-accent:${De(this.detail.title, this.config.subject_colors).background}`}
