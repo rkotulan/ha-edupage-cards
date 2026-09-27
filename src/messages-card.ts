@@ -73,7 +73,6 @@ export class EdupageMessagesCard extends LitElement {
       </div>
       ${data.unavailable ? html`<div class="notice" role="alert">${this.t('Senzor zpráv není dostupný. Zkontrolujte připojení konektoru.','The message sensor is unavailable. Check the integration connection.')}</div>` : data.unsupported ? html`<div class="notice" role="alert">${this.t('Senzor neposkytuje seznam událostí. Vyberte senzor oznámení EduPage s atributem events.','The sensor does not provide an event list. Select an EduPage notification sensor with the events attribute.')}</div>` : html`
         ${data.stale ? html`<div class="notice" role="status">${this.t('Údaje mohou být zastaralé. Zobrazuje se poslední dostupná historie.','Data may be stale. Showing the last available history.')}</div>` : nothing}
-        ${data.truncated ? html`<div class="notice">${this.t('Konektor poskytuje jen část historie. Starší zprávy zde mohou chybět.','The integration provides only part of the history. Older messages may be missing.')}</div>` : nothing}
         <div class="message-count">${this.t('Zobrazeno','Showing')} ${messages.length} ${this.t('z','of')} ${data.messages.length} ${this.t('dostupných zpráv','available messages')}</div>
         ${keyed(person.entity,html`<div class="messages-list">${messages.length ? messages.map(message=>keyed(message.key,html`<button class="school-message" @click=${()=>void this.openDetail(message)}>
           <span class="message-meta"><span class="message-author">${message.author || this.t('Odesílatel neuveden','Sender unavailable')}</span><span>${messageDate(message.timestamp,this.config!.language ?? this.hass!.language) || this.t('Datum neuvedeno','Date unavailable')}</span></span>
@@ -91,7 +90,8 @@ export class EdupageMessagesCard extends LitElement {
         <div class="message-meta">${messageDate(this.detail.timestamp,this.config.language ?? this.hass.language) || this.t('Datum neuvedeno','Date unavailable')}</div>
         <div class="message-body">${this.detail.text || this.t('Text zprávy není dostupný.','Message text is unavailable.')}</div>
       </dialog>` : nothing}
-      <footer>${this.t('Zobrazení zprávy zde nemění stav přečtení v EduPage.','Viewing a message here does not mark it as read in EduPage.')}</footer>
+      <footer>${data.truncated && !data.unavailable && !data.unsupported ? html`<div>${this.t('Konektor poskytuje jen část historie. Starší zprávy zde mohou chybět.','The integration provides only part of the history. Older messages may be missing.')}</div>` : nothing}
+        <div>${this.t('Zobrazení zprávy zde nemění stav přečtení v EduPage.','Viewing a message here does not mark it as read in EduPage.')}</div></footer>
     </ha-card>`;
   }
 }

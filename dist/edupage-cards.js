@@ -1210,7 +1210,6 @@ var Ue = class extends U {
       </div>
       ${r.unavailable ? M`<div class="notice" role="alert">${this.t("Senzor zpráv není dostupný. Zkontrolujte připojení konektoru.", "The message sensor is unavailable. Check the integration connection.")}</div>` : r.unsupported ? M`<div class="notice" role="alert">${this.t("Senzor neposkytuje seznam událostí. Vyberte senzor oznámení EduPage s atributem events.", "The sensor does not provide an event list. Select an EduPage notification sensor with the events attribute.")}</div>` : M`
         ${r.stale ? M`<div class="notice" role="status">${this.t("Údaje mohou být zastaralé. Zobrazuje se poslední dostupná historie.", "Data may be stale. Showing the last available history.")}</div>` : P}
-        ${r.truncated ? M`<div class="notice">${this.t("Konektor poskytuje jen část historie. Starší zprávy zde mohou chybět.", "The integration provides only part of the history. Older messages may be missing.")}</div>` : P}
         <div class="message-count">${this.t("Zobrazeno", "Showing")} ${i.length} ${this.t("z", "of")} ${r.messages.length} ${this.t("dostupných zpráv", "available messages")}</div>
         ${ze(t.entity, M`<div class="messages-list">${i.length ? i.map((e) => ze(e.key, M`<button class="school-message" @click=${() => void this.openDetail(e)}>
           <span class="message-meta"><span class="message-author">${e.author || this.t("Odesílatel neuveden", "Sender unavailable")}</span><span>${Z(e.timestamp, this.config.language ?? this.hass.language) || this.t("Datum neuvedeno", "Date unavailable")}</span></span>
@@ -1236,7 +1235,8 @@ var Ue = class extends U {
         <div class="message-meta">${Z(this.detail.timestamp, this.config.language ?? this.hass.language) || this.t("Datum neuvedeno", "Date unavailable")}</div>
         <div class="message-body">${this.detail.text || this.t("Text zprávy není dostupný.", "Message text is unavailable.")}</div>
       </dialog>` : P}
-      <footer>${this.t("Zobrazení zprávy zde nemění stav přečtení v EduPage.", "Viewing a message here does not mark it as read in EduPage.")}</footer>
+      <footer>${r.truncated && !r.unavailable && !r.unsupported ? M`<div>${this.t("Konektor poskytuje jen část historie. Starší zprávy zde mohou chybět.", "The integration provides only part of the history. Older messages may be missing.")}</div>` : P}
+        <div>${this.t("Zobrazení zprávy zde nemění stav přečtení v EduPage.", "Viewing a message here does not mark it as read in EduPage.")}</div></footer>
     </ha-card>`;
 	}
 };
