@@ -21,6 +21,27 @@ export class EdupageTimetableCard extends LitElement {
   private now = new Date();
   private timer?: ReturnType<typeof setInterval>;
   private calendar = new CalendarController(this);
+  private detailPointerOutside = false;
+
+  private async openDetail(lesson: Lesson): Promise<void> {
+    this.detail = lesson;
+    await this.updateComplete;
+    if (!this.isConnected || this.detail !== lesson) return;
+    const dialog = this.renderRoot.querySelector<HTMLDialogElement>('.detail');
+    if (dialog && !dialog.open) dialog.showModal();
+  }
+
+  private closeDetail(): void {
+    this.renderRoot.querySelector<HTMLDialogElement>('.detail')?.close();
+    this.detail = undefined;
+    this.detailPointerOutside = false;
+  }
+
+  private outsideDetail(event: MouseEvent): boolean {
+    const dialog = event.currentTarget as HTMLDialogElement;
+    const rect = dialog.getBoundingClientRect();
+    return event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom);
+  }
   private dismissStudentPicker = (event: Event): void => {
     const picker = this.renderRoot.querySelector<HTMLDetailsElement>('.student-picker');
     if (picker && !event.composedPath().includes(picker)) picker.open = false;
@@ -75,6 +96,7 @@ export class EdupageTimetableCard extends LitElement {
   }
 
   disconnectedCallback(): void {
+    this.closeDetail();
     super.disconnectedCallback(); clearInterval(this.timer);
     document.removeEventListener('pointerdown', this.dismissStudentPicker);
     this.closeStudentPicker();
@@ -113,7 +135,7 @@ export class EdupageTimetableCard extends LitElement {
     return html`<button class="lesson ${lesson.allDay ? 'all-day' : ''} ${lesson.cancelled ? 'cancelled' : ''} ${current ? 'current' : ''}"
       style=${`--lesson-bg:${colors.background};--lesson-text:${colors.text};--lesson-border:${colors.border};--lesson-accent:${colors.accent};--lane:${lesson.lane};--left:${(lesson.start - start) / (end - start) * 100}%;--width:calc(${(lesson.end - lesson.start) / (end - start) * 100}% - 3px)`}
       aria-label=${`${lesson.title}, ${this.format(lesson.day)}, ${lesson.allDay ? this.t('Celý den', 'All day') : clock(lesson.start) + '–' + clock(lesson.end)}${lesson.cancelled ? ', ' + this.t('Zrušeno', 'Cancelled') : ''}`}
-      title=${lesson.title} @click=${() => { this.detail = lesson; }}>
+      title=${lesson.title} @click=${() => void this.openDetail(lesson)}>
       <span class="meta"><span>${lesson.allDay ? this.t('Celý den', 'All day') : `${clock(lesson.start)}–${clock(lesson.end)}`}</span><span>${lesson.location}</span></span>
       <strong>${label}</strong><span class="teacher">${lesson.cancelled ? this.t('Zrušeno', 'Cancelled') : lesson.teacher}</span>
     </button>`;
@@ -177,13 +199,19 @@ export class EdupageTimetableCard extends LitElement {
         <div class="mobile"><div class="days">${days.map((day, i) => html`<button aria-pressed=${i === this.selectedDay} @click=${() => { this.selectedDay = i; this.detail = undefined; }}>${this.format(day, true)}<span>${this.format(day)}</span></button>`)}</div>
           ${dayLessons(days[this.selectedDay]).length ? dayLessons(days[this.selectedDay]).map(l => this.lesson(l, start, end, today)) : html`<div class="empty">${empty(days[this.selectedDay])}</div>`}
         </div>`}
-      ${this.detail ? html`<section class="detail" aria-label=${this.t('Detail hodiny', 'Lesson details')} aria-live="polite"><div class="detail-head"><h3>${this.detail.title}</h3><button class="tool" aria-label=${this.t('Zavřít detail', 'Close details')} @click=${() => { this.detail = undefined; }}>×</button></div>
+      ${this.detail ? html`<dialog class="detail" aria-labelledby="lesson-detail-title"
+        style=${`--detail-accent:${lessonColors(this.detail.title, this.config.subject_colors).background}`}
+        @cancel=${(e: Event) => { e.preventDefault(); e.stopPropagation(); this.closeDetail(); }}
+        @close=${() => { this.detail = undefined; }}
+        @pointerdown=${(e: PointerEvent) => { this.detailPointerOutside = this.outsideDetail(e); }}
+        @click=${(e: MouseEvent) => { if (this.detailPointerOutside && this.outsideDetail(e)) this.closeDetail(); }}>
+        <div class="detail-head"><div><div class="eyebrow">${this.t('DETAIL HODINY', 'LESSON DETAILS')}</div><h3 id="lesson-detail-title">${this.detail.title}</h3></div><button class="tool detail-close" autofocus aria-label=${this.t('Zavřít detail', 'Close details')} @click=${this.closeDetail}>×</button></div>
         <p>${this.format(this.detail.day, true)} ${this.format(this.detail.day)} · ${this.detail.allDay ? this.t('Celý den', 'All day') : `${clock(this.detail.start)}–${clock(this.detail.end)}`}</p>
         ${this.detail.cancelled ? html`<p>${this.t('Zrušená hodina', 'Cancelled lesson')}</p>` : nothing}
         ${this.detail.teacher ? html`<p>${this.t('Vyučující', 'Teacher')}: ${this.detail.teacher}</p>` : nothing}
         ${this.detail.location ? html`<p>${this.t('Učebna', 'Room')}: ${this.detail.location}</p>` : nothing}
         ${this.detail.description && !this.detail.description.startsWith('Teacher(s):') ? html`<p>${this.detail.description}</p>` : nothing}
-      </section>` : nothing}
+      </dialog>` : nothing}
       <footer>${this.t('Dostupný rozsah', 'Available range')}: ${this.format(today)} – ${this.format(lastDay)}. ${this.t('Prázdný den nemusí znamenat volno.', 'An empty day does not necessarily mean no school.')}
         ${this.calendar.updated ? html`<br>${this.t('Načteno', 'Loaded')} ${new Intl.DateTimeFormat(this.cs ? 'cs' : 'en', { timeZone: this.hass.config.time_zone, hour: '2-digit', minute: '2-digit' }).format(this.calendar.updated)}` : nothing}</footer>
     </ha-card>`;

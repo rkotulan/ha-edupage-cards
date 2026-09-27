@@ -62,10 +62,15 @@ export const styles = css`
   .message { padding: 28px 24px; text-align: center; line-height: 1.6; }
   .message button { margin-top: 12px; }
   footer { font-size: 11px; line-height: 1.6; padding: 12px 24px 18px; border-top: 1px solid var(--divider-color, #e7edf0); }
-  .detail { margin: 4px 20px 16px; padding: 16px; background: var(--secondary-background-color, #f6f8fa); border: 1px solid var(--divider-color, #d9e1e6); border-radius: 12px; }
+  .detail { position: fixed; inset: 0; margin: auto; width: min(480px, calc(100vw - 32px)); max-height: 85dvh; overflow-y: auto; padding: 24px; color: var(--primary-text-color, #182635); background: var(--ha-card-background, var(--card-background-color, #fff)); border: 1px solid var(--divider-color, #d9e1e6); border-top: 6px solid var(--detail-accent); border-radius: 20px; box-shadow: 0 24px 80px #0006; }
+  .detail::backdrop { background: #0008; }
+  .detail-close { flex-shrink: 0; min-width: 44px; min-height: 44px; font-size: 22px; }
   .detail-head { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
-  .detail h3 { margin: 0 0 10px; font-size: 18px; }
-  .detail p { font-size: 14px; margin: 7px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .detail h3 { margin: 0 0 16px; font-size: 22px; line-height: 1.3; overflow-wrap: anywhere; }
+  .detail p { font-size: 14px; line-height: 1.6; margin: 10px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+  @media (max-width: 600px) {
+    .detail { inset: auto 0 0; margin: 0; width: 100%; max-width: none; max-height: 85dvh; border-radius: 24px 24px 0 0; padding: 24px 20px calc(24px + env(safe-area-inset-bottom, 0px)); }
+  }
   .mobile { display: none; padding: 0 16px 16px; }
   .days { display: flex; gap: 5px; margin-bottom: 16px; }
   .days button { flex: 1; min-width: 0; border-radius: 10px; padding: 10px 3px; border: 1px solid var(--divider-color, #d9e1e6); background: transparent; font-size: 11px; }
@@ -82,6 +87,5 @@ export const styles = css`
     .mobile { display: block; }
     .range { width: 100%; }
     footer { padding: 12px 16px 16px; }
-    .detail { margin: 0 16px 16px; }
   }
 `;
