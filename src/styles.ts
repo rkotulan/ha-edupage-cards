@@ -49,6 +49,8 @@ export const styles = css`
   .lesson { position: absolute; top: calc(7px + var(--lane) * var(--lane-height)); left: var(--left); width: var(--width); height: var(--lesson-height); padding: 8px; text-align: left; border: 1px solid var(--lesson-border); border-left: 3px solid var(--lesson-accent); border-radius: 7px; overflow: hidden; background: var(--lesson-bg); color: var(--lesson-text); display: flex; flex-direction: column; gap: 3px; }
   .lesson:hover { filter: brightness(.96); }
   .lesson .meta { display: flex; justify-content: space-between; gap: 5px; font-size: 10px; line-height: 1.4; flex-shrink: 0; white-space: nowrap; }
+  .lesson .meta > :first-child { flex: 0 0 auto; }
+  .lesson .meta > :last-child { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; text-align: right; }
   .lesson strong { flex-shrink: 0; font-size: 12px; line-height: 1.25; max-height: 2.5em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
   .lesson .teacher { flex-shrink: 0; font-size: 10px; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; margin-top: auto; }
   .lesson.current { outline: 2px solid var(--primary-color, #007b83); outline-offset: -2px; }
@@ -66,6 +68,7 @@ export const styles = css`
   .detail::backdrop { background: #0008; }
   .detail-close { flex-shrink: 0; min-width: 44px; min-height: 44px; font-size: 22px; }
   .detail-head { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+  .detail-head > div { min-width: 0; }
   .detail h3 { margin: 0 0 16px; font-size: 22px; line-height: 1.3; overflow-wrap: anywhere; }
   .detail p { font-size: 14px; line-height: 1.6; margin: 10px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
   @media (max-width: 600px) {
