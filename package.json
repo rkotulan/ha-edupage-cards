@@ -1,0 +1,34 @@
+{
+  "name": "ha-edupage-cards",
+  "version": "0.1.0",
+  "description": "EduPage timetable and family overview cards for Home Assistant",
+  "main": "dist/edupage-cards.js",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "type-check": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rkotulan/ha-edupage-cards.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/rkotulan/ha-edupage-cards/issues"
+  },
+  "homepage": "https://github.com/rkotulan/ha-edupage-cards#readme",
+  "dependencies": {
+    "lit": "^3.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1"
+  },
+  "private": true
+}

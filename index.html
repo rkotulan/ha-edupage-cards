@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>EduPage Cards · Demo</title>
+    <style>
+      body { font: 15px system-ui, sans-serif; margin: 24px; background: #eef2f5; color: #182635; --primary-color: #087e87; }
+      body.dark { background: #111820; color: #edf3f8; --primary-text-color: #edf3f8; --secondary-text-color: #a2b1be; --card-background-color: #1c2630; --secondary-background-color: #263440; --divider-color: #364451; }
+      main { max-width: 1250px; margin: auto; }
+      nav { display: flex; gap: 12px; align-items: center; margin-bottom: 18px; flex-wrap: wrap; }
+      button { padding: 8px 12px; cursor: pointer; }
+      small { opacity: .7; }
+      @media(max-width: 600px) { body { margin: 12px; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <nav><strong>EduPage Cards</strong><small>Demo · smyšlená data</small><button id="theme">Světlý / tmavý motiv</button><button id="offline">Simulovat výpadek</button></nav>
+      <edupage-timetable-card></edupage-timetable-card>
+    </main>
+    <script type="module" src="/demo.ts"></script>
+  </body>
+</html>

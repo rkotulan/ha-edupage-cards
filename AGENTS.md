@@ -4,7 +4,7 @@ This is a standalone Home Assistant Lovelace card project, separate from wall-cl
 
 ## Scope
 
-Start with `edupage-timetable-card`. TypeScript and Lit are the intended stack; build tooling has not yet been set up. Keep data access separate from rendering and keep timetable calculations testable without Home Assistant.
+The first card is `edupage-timetable-card`, built with TypeScript, Lit, and Vite. Keep data access (`src/calendar-controller.ts`) separate from rendering (`src/index.ts`) and timetable calculations (`src/timetable.ts`) testable without Home Assistant.
 
 ## Data and privacy
 
@@ -14,4 +14,4 @@ Do not infer that missing calendar results mean no school. Account for Home Assi
 
 ## Validation
 
-After adding tooling, document the build, type-check, and test commands in README.md. Test meaningful timetable edge cases and verify the card in Home Assistant before claiming it is ready to install.
+Run `npm run type-check`, `npm test`, and `npm run build`. `npm run dev` serves a synthetic browser demo. Test meaningful timetable edge cases and verify the card in Home Assistant before claiming it is ready to install.
