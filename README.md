@@ -4,7 +4,7 @@ School timetable cards for a family Home Assistant dashboard. The first card, `e
 
 ## Status
 
-First working development version, tested in Home Assistant with two EduPage calendars. There is no published release or HACS installation yet. Build and install manually using the instructions below.
+First release, tested in Home Assistant with two EduPage calendars. The repository supports installation through HACS as a custom repository. Inclusion in the default HACS catalog is requested separately.
 
 ## Features
 
@@ -26,7 +26,17 @@ The current calendar does not expose lesson numbers, school-defined colors, grou
 
 Configuration is YAML-only for now. Calendar data refreshes on entity changes, every five minutes, or via the refresh button. The refresh button rereads HA's cache; it does not force a new EduPage poll.
 
-## Build and install
+## Install with HACS
+
+1. In HACS, open the menu and choose **Custom repositories**.
+2. Add `https://github.com/rkotulan/ha-edupage-cards` with type **Dashboard**.
+3. Find **EduPage Cards**, download it, and reload your browser.
+4. If the resource was not added automatically, add `/hacsfiles/ha-edupage-cards/edupage-cards.js` as a JavaScript module in dashboard resources.
+5. Add a manual card using the configuration below.
+
+Do not load both a manually installed copy and the HACS resource.
+
+## Build and install manually
 
 Requires Node.js 22.12+ and npm.
 
