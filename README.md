@@ -103,3 +103,32 @@ Use synthetic fixtures only. Never commit actual school messages, student detail
 ## License
 
 MIT. This is an independent community project, not an official EduPage product.
+
+## Messages card
+
+`custom:edupage-messages-card` shows messages from EduPage notification sensors. It uses the structured `events` attribute and filters events with type `sprava`. The integration must expose this attribute; the card reports unsupported sensors instead of presenting them as an empty inbox.
+
+```yaml
+type: custom:edupage-messages-card
+language: cs
+students:
+  - entity: sensor.edupage_notification_student_one
+    name: Student one
+  - entity: sensor.edupage_notification_student_two
+    name: Student two
+max_messages: 10
+```
+
+For a single student, use `entity` or a one-item `students` list. The visual editor supports notification sensors, student names/order, title, language, visibility and the message limit.
+
+| Option | Default | Meaning |
+| --- | --- | --- |
+| `entity` / `students` | Required | Notification sensor or list of `{entity, name}` entries |
+| `title` | Localized “School messages” | Card heading |
+| `language` | HA language | `cs` or `en` |
+| `show_student` | `true` | Show student identity/picker; when hidden, use the first student |
+| `max_messages` | `10` | Show the newest 1–100 messages available in the sensor |
+
+Expand a message to read its full available text. Content is displayed as plain text, never executed as HTML. Attachments, replies and EduPage read receipts are not supported. Viewing a message does not mark it as read in EduPage. Messages update when HA updates the sensor; the card does not trigger additional EduPage requests.
+
+The sensor can provide only part of the history. The card displays `events_truncated` and `data_stale` warnings, differentiates unavailable/unsupported sensors from an empty history, and does not claim to show all messages or an unread count. Timestamps without a timezone are displayed as supplied by the connector, without conversion to the browser timezone.

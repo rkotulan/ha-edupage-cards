@@ -6,6 +6,7 @@ import type { HomeAssistant, Lesson, TimetableConfig } from './types';
 import { styles } from './styles';
 import { lessonColors, validateColors } from './colors';
 import './editor';
+import './messages-card';
 
 export class EdupageTimetableCard extends LitElement {
   static styles = styles;
