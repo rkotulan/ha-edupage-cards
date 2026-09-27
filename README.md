@@ -129,6 +129,6 @@ For a single student, use `entity` or a one-item `students` list. The visual edi
 | `show_student` | `true` | Show student identity/picker; when hidden, use the first student |
 | `max_messages` | `10` | Show the newest 1–100 messages available in the sensor |
 
-Expand a message to read its full available text. Content is displayed as plain text, never executed as HTML. Attachments, replies and EduPage read receipts are not supported. Viewing a message does not mark it as read in EduPage. Messages update when HA updates the sensor; the card does not trigger additional EduPage requests.
+Open a message to read its full available text in a dialog (a bottom sheet on mobile). Close it with Escape, the close button or a click outside. Both cards use the same student selector with keyboard navigation. Content is displayed as plain text, never executed as HTML. Attachments, replies and EduPage read receipts are not supported. Viewing a message does not mark it as read in EduPage. Messages update when HA updates the sensor; the card does not trigger additional EduPage requests.
 
 The sensor can provide only part of the history. The card displays `events_truncated` and `data_stale` warnings, differentiates unavailable/unsupported sensors from an empty history, and does not claim to show all messages or an unread count. Timestamps without a timezone are displayed as supplied by the connector, without conversion to the browser timezone.

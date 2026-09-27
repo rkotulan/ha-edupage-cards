@@ -6,6 +6,7 @@ import type { HomeAssistant, Lesson, TimetableConfig } from './types';
 import { styles } from './styles';
 import { lessonColors, validateColors } from './colors';
 import './editor';
+import './student-picker';
 import './messages-card';
 
 export class EdupageTimetableCard extends LitElement {
@@ -44,35 +45,6 @@ export class EdupageTimetableCard extends LitElement {
     const rect = dialog.getBoundingClientRect();
     return event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom);
   }
-  private dismissStudentPicker = (event: Event): void => {
-    const picker = this.renderRoot.querySelector<HTMLDetailsElement>('.student-picker');
-    if (picker && !event.composedPath().includes(picker)) picker.open = false;
-  };
-
-  private closeStudentPicker(focus = false): void {
-    const picker = this.renderRoot.querySelector<HTMLDetailsElement>('.student-picker');
-    if (picker) {
-      picker.open = false;
-      if (focus) picker.querySelector('summary')?.focus();
-    }
-  }
-
-  private studentKeys(event: KeyboardEvent): void {
-    const picker = event.currentTarget as HTMLDetailsElement;
-    if (event.key === 'Escape') {
-      event.preventDefault(); event.stopPropagation(); this.closeStudentPicker(true);
-    } else if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
-      event.preventDefault();
-      picker.open = true;
-      const items = [...picker.querySelectorAll<HTMLButtonElement>('.student-option')];
-      const index = items.indexOf(this.shadowRoot?.activeElement as HTMLButtonElement);
-      const next = event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1
-        : index < 0 ? (event.key === 'ArrowUp' ? items.length - 1 : 0)
-        : (index + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
-      items[next]?.focus();
-    }
-  }
-
   setConfig(config: TimetableConfig): void {
     students(config);
     validateColors(config.subject_colors);
@@ -93,7 +65,6 @@ export class EdupageTimetableCard extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
-    document.addEventListener('pointerdown', this.dismissStudentPicker);
     this.now = new Date();
     this.timer = setInterval(() => { this.now = new Date(); }, 30_000);
   }
@@ -101,8 +72,6 @@ export class EdupageTimetableCard extends LitElement {
   disconnectedCallback(): void {
     this.closeDetail();
     super.disconnectedCallback(); clearInterval(this.timer);
-    document.removeEventListener('pointerdown', this.dismissStudentPicker);
-    this.closeStudentPicker();
   }
 
   protected willUpdate(_changed: PropertyValues): void {
@@ -170,26 +139,9 @@ export class EdupageTimetableCard extends LitElement {
         <button class="tool refresh" aria-label=${this.t('Obnovit rozvrh', 'Refresh timetable')} @click=${() => { this.detail = undefined; void this.calendar.refresh(); }}>↻</button>
         </div>
       ${this.config.show_student !== false ? html`<div class="student-row">
-        ${people.length > 1 ? html`<details class="student-picker" @keydown=${this.studentKeys}
-          @focusout=${(e: FocusEvent) => { if (!(e.currentTarget as HTMLElement).contains(e.relatedTarget as Node | null)) this.closeStudentPicker(); }}>
-          <summary aria-label=${`${this.t('Vybrat dítě', 'Choose student')}: ${studentName(this.studentIndex)}`}>
-            <span class="student-avatar" aria-hidden="true">${studentName(this.studentIndex).trim().slice(0, 1).toLocaleUpperCase()}</span>
-            <span class="student-name">${studentName(this.studentIndex)}</span>
-            <svg class="student-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5" /></svg>
-          </summary>
-          <div class="student-options" role="group" aria-label=${this.t('Dítě', 'Student')}>
-            <span class="student-caption">${this.t('Zobrazit rozvrh', 'Show timetable')}</span>
-            ${people.map((_s, i) => html`<button class="student-option" aria-pressed=${i === this.studentIndex}
-              @click=${() => { this.studentIndex = i; this.detail = undefined; this.closeStudentPicker(true); }}>
-              <span class="student-avatar" aria-hidden="true">${studentName(i).trim().slice(0, 1).toLocaleUpperCase()}</span>
-              <span class="student-name">${studentName(i)}</span><span class="student-check" aria-hidden="true">${i === this.studentIndex ? '✓' : ''}</span>
-            </button>`)}
-          </div>
-        </details>`
-          : html`<div class="student-static">
-              <span class="student-avatar" aria-hidden="true">${studentName(this.studentIndex).trim().slice(0, 1).toLocaleUpperCase()}</span>
-              <span class="student-name">${studentName(this.studentIndex)}</span>
-            </div>`}
+        <edupage-student-picker .names=${people.map((_, i) => studentName(i))} .selected=${this.studentIndex}
+          .language=${this.cs ? 'cs' : 'en'} .caption=${this.t('Zobrazit rozvrh', 'Show timetable')}
+          @student-changed=${(e: CustomEvent<{ index: number }>) => { this.closeDetail(); this.studentIndex = e.detail.index; }}></edupage-student-picker>
       </div>` : nothing}
       </div>
       ${this.calendar.loading ? html`<div class="message" role="status">${this.t('Načítám rozvrh…', 'Loading timetable…')}</div>`

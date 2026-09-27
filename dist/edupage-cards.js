@@ -675,23 +675,6 @@ var Te = class {
   .student-row { display: flex; justify-content: flex-end; min-width: 0; }
   .eyebrow { font-size: 10px; letter-spacing: .16em; font-weight: 700; color: var(--secondary-text-color, #687987); margin-bottom: 5px; }
   h2 { font-size: 23px; letter-spacing: -.03em; line-height: 1.2; margin: 0; font-weight: 650; }
-  .student-picker { position: relative; max-width: 100%; font-size: 14px; }
-  .student-picker summary, .student-static { display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 6px 12px 6px 8px; border: 1px solid var(--divider-color, #d9e1e6); border-radius: 14px; background: var(--secondary-background-color, #f6f8fa); }
-  .student-picker summary { list-style: none; cursor: pointer; }
-  .student-static { max-width: 100%; min-width: 0; font-size: 14px; }
-  .student-picker summary::-webkit-details-marker { display: none; }
-  .student-picker summary:hover, .student-picker[open] summary { border-color: color-mix(in srgb, var(--primary-color, #007b83) 55%, var(--divider-color, #d9e1e6)); }
-  .student-avatar { display: grid; place-items: center; flex: 0 0 30px; width: 30px; height: 30px; border-radius: 10px; background: color-mix(in srgb, var(--primary-color, #007b83) 14%, transparent); color: var(--primary-color, #007b83); font-weight: 700; font-size: 13px; }
-  .student-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
-  summary .student-name, .student-static .student-name { max-width: 180px; font-weight: 600; }
-  .student-chevron { width: 18px; height: 18px; flex: 0 0 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; opacity: .65; }
-  .student-picker[open] .student-chevron { transform: rotate(180deg); }
-  .student-options { position: absolute; top: calc(100% + 8px); right: 0; z-index: 20; width: max(100%, 220px); max-width: calc(100vw - 40px); max-height: 300px; overflow-y: auto; padding: 7px; border: 1px solid var(--divider-color, #d9e1e6); border-radius: 16px; background: var(--ha-card-background, var(--card-background-color, #fff)); box-shadow: 0 12px 32px #0003; }
-  .student-caption { display: block; padding: 7px 9px 10px; font-size: 11px; color: var(--secondary-text-color, #687987); }
-  .student-option { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 46px; padding: 8px; margin: 2px 0; border: 0; border-radius: 10px; background: transparent; }
-  .student-option:hover { background: var(--secondary-background-color, #f6f8fa); }
-  .student-option[aria-pressed=true] { background: color-mix(in srgb, var(--primary-color, #007b83) 12%, transparent); font-weight: 600; }
-  .student-check { margin-left: auto; min-width: 18px; color: var(--primary-color, #007b83); }
   .toolbar { display: grid; grid-template-columns: auto auto minmax(0, 1fr); align-items: center; gap: 12px; padding: 18px 24px 16px; }
   .period-controls { display: flex; align-items: center; gap: 10px; min-width: 0; }
   .refresh { flex-shrink: 0; }
@@ -926,11 +909,106 @@ var ke = class extends J {
 };
 customElements.get("edupage-timetable-editor") || customElements.define("edupage-timetable-editor", ke);
 //#endregion
+//#region src/student-picker.ts
+var Ae = class extends J {
+	constructor(...e) {
+		super(...e), this.names = [], this.selected = 0, this.language = "en", this.caption = "", this.dismiss = (e) => {
+			e.composedPath().includes(this) || this.close();
+		};
+	}
+	static {
+		this.properties = {
+			names: { attribute: !1 },
+			selected: { type: Number },
+			language: {},
+			caption: {}
+		};
+	}
+	static {
+		this.styles = o`
+    :host { display:block; min-width:0; max-width:100%; color:inherit; }
+    * { box-sizing:border-box; }
+    button { font:inherit; color:inherit; cursor:pointer; }
+    button:focus-visible, summary:focus-visible { outline:2px solid var(--primary-color,#007b83); outline-offset:3px; }
+  .student-picker { position: relative; max-width: 100%; font-size: 14px; }
+  .student-picker summary, .student-static { display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 6px 12px 6px 8px; border: 1px solid var(--divider-color, #d9e1e6); border-radius: 14px; background: var(--secondary-background-color, #f6f8fa); }
+  .student-picker summary { list-style: none; cursor: pointer; }
+  .student-static { max-width: 100%; min-width: 0; font-size: 14px; }
+  .student-picker summary::-webkit-details-marker { display: none; }
+  .student-picker summary:hover, .student-picker[open] summary { border-color: color-mix(in srgb, var(--primary-color, #007b83) 55%, var(--divider-color, #d9e1e6)); }
+  .student-avatar { display: grid; place-items: center; flex: 0 0 30px; width: 30px; height: 30px; border-radius: 10px; background: color-mix(in srgb, var(--primary-color, #007b83) 14%, transparent); color: var(--primary-color, #007b83); font-weight: 700; font-size: 13px; }
+  .student-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+  summary .student-name, .student-static .student-name { max-width: 180px; font-weight: 600; }
+  .student-chevron { width: 18px; height: 18px; flex: 0 0 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; opacity: .65; }
+  .student-picker[open] .student-chevron { transform: rotate(180deg); }
+  .student-options { position: absolute; top: calc(100% + 8px); right: 0; z-index: 20; width: max(100%, 220px); max-width: calc(100vw - 40px); max-height: 300px; overflow-y: auto; padding: 7px; border: 1px solid var(--divider-color, #d9e1e6); border-radius: 16px; background: var(--ha-card-background, var(--card-background-color, #fff)); box-shadow: 0 12px 32px #0003; }
+  .student-caption { display: block; padding: 7px 9px 10px; font-size: 11px; color: var(--secondary-text-color, #687987); }
+  .student-option { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 46px; padding: 8px; margin: 2px 0; border: 0; border-radius: 10px; background: transparent; }
+  .student-option:hover { background: var(--secondary-background-color, #f6f8fa); }
+  .student-option[aria-pressed=true] { background: color-mix(in srgb, var(--primary-color, #007b83) 12%, transparent); font-weight: 600; }
+  .student-check { margin-left: auto; min-width: 18px; color: var(--primary-color, #007b83); }
+
+  `;
+	}
+	get picker() {
+		return this.renderRoot.querySelector("details");
+	}
+	close(e = !1) {
+		let t = this.picker;
+		t && (t.open = !1, e && t.querySelector("summary")?.focus());
+	}
+	connectedCallback() {
+		super.connectedCallback(), document.addEventListener("pointerdown", this.dismiss);
+	}
+	disconnectedCallback() {
+		this.close(), document.removeEventListener("pointerdown", this.dismiss), super.disconnectedCallback();
+	}
+	keys(e) {
+		if (e.key === "Escape") e.preventDefault(), e.stopPropagation(), this.close(!0);
+		else if ([
+			"ArrowDown",
+			"ArrowUp",
+			"Home",
+			"End"
+		].includes(e.key)) {
+			e.preventDefault(), this.picker.open = !0;
+			let t = [...this.renderRoot.querySelectorAll(".student-option")], n = t.indexOf(this.shadowRoot?.activeElement);
+			t[e.key === "Home" ? 0 : e.key === "End" ? t.length - 1 : n < 0 ? e.key === "ArrowUp" ? t.length - 1 : 0 : (n + (e.key === "ArrowDown" ? 1 : -1) + t.length) % t.length]?.focus();
+		}
+	}
+	choose(e) {
+		this.close(!0), this.dispatchEvent(new CustomEvent("student-changed", {
+			detail: { index: e },
+			bubbles: !0,
+			composed: !0
+		}));
+	}
+	render() {
+		if (!this.names.length) return L;
+		let e = this.language.startsWith("cs"), t = (e) => F`<span class="student-avatar" aria-hidden="true">${this.names[e].trim().slice(0, 1).toLocaleUpperCase()}</span><span class="student-name">${this.names[e]}</span>`;
+		return this.names.length === 1 ? F`<div class="student-static">${t(0)}</div>` : F`<details class="student-picker" @keydown=${this.keys}
+      @focusout=${(e) => {
+			e.currentTarget.contains(e.relatedTarget) || this.close();
+		}}>
+      <summary aria-label=${(e ? "Vybrat dítě: " : "Choose student: ") + this.names[this.selected]}>
+        ${t(this.selected)}<svg class="student-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5" /></svg>
+      </summary>
+      <div class="student-options" role="group" aria-label=${e ? "Žák" : "Student"}>
+        ${this.caption ? F`<span class="student-caption">${this.caption}</span>` : L}
+        ${this.names.map((e, n) => F`<button class="student-option" aria-pressed=${n === this.selected} @click=${() => this.choose(n)}>
+          ${t(n)}<span class="student-check" aria-hidden="true">${n === this.selected ? "✓" : ""}</span>
+        </button>`)}
+      </div>
+    </details>`;
+	}
+};
+customElements.get("edupage-student-picker") || customElements.define("edupage-student-picker", Ae);
+//#endregion
 //#region node_modules/lit-html/directive.js
-var Ae = (e) => (...t) => ({
+var je = (e) => (...t) => ({
 	_$litDirective$: e,
 	values: t
-}), je = class {
+}), Me = class {
 	constructor(e) {}
 	get _$AU() {
 		return this._$AM._$AU;
@@ -944,7 +1022,7 @@ var Ae = (e) => (...t) => ({
 	update(e, t) {
 		return this.render(...t);
 	}
-}, { I: Me } = me, Ne = {}, Pe = (e, t = Ne) => e._$AH = t, Fe = Ae(class extends je {
+}, { I: Ne } = me, Pe = {}, Fe = (e, t = Pe) => e._$AH = t, Ie = je(class extends Me {
 	constructor() {
 		super(...arguments), this.key = L;
 	}
@@ -952,24 +1030,24 @@ var Ae = (e) => (...t) => ({
 		return this.key = e, t;
 	}
 	update(e, [t, n]) {
-		return t !== this.key && (Pe(e), this.key = t), n;
+		return t !== this.key && (Fe(e), this.key = t), n;
 	}
 });
 //#endregion
 //#region src/messages.ts
-function Ie(e) {
+function Le(e) {
 	let t = e.students ?? (e.entity ? [{ entity: e.entity }] : []);
 	if (!Array.isArray(t) || !t.length || t.some((e) => !e || typeof e.entity != "string" || !e.entity.startsWith("sensor."))) throw Error("Configure a notification sensor in entity or students.");
 	if (e.max_messages !== void 0 && (!Number.isInteger(e.max_messages) || e.max_messages < 1 || e.max_messages > 100)) throw Error("max_messages must be between 1 and 100.");
 	return t;
 }
-function Le(e, t) {
+function Re(e, t) {
 	let n = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::\d{2})?$/.exec(e);
 	if (!n) return e;
 	let [, r, i, a, o, s] = n;
 	return t.startsWith("cs") ? `${Number(a)}. ${Number(i)}. ${r} · ${o}:${s}` : `${a}/${i}/${r} · ${o}:${s}`;
 }
-function Re(e) {
+function ze(e) {
 	let t = !e || ["unavailable", "unknown"].includes(e.state), n = e?.attributes ?? {}, r = n.events, i = [];
 	return Array.isArray(r) && r.forEach((e, t) => {
 		if (!e || typeof e != "object") return;
@@ -990,7 +1068,7 @@ function Re(e) {
 }
 //#endregion
 //#region src/messages-editor.ts
-var ze = class extends J {
+var Be = class extends J {
 	static {
 		this.properties = {
 			hass: { attribute: !1 },
@@ -1042,47 +1120,43 @@ var ze = class extends J {
   <label>${this.t("Jazyk", "Language")}<select .value=${this.config.language ?? ""} @change=${(e) => this.updateConfig({ language: e.target.value || void 0 })}><option value="" ?selected=${!this.config.language}>Home Assistant</option><option value="cs" ?selected=${this.config.language === "cs"}>Čeština</option><option value="en" ?selected=${this.config.language === "en"}>English</option></select></label></fieldset>`;
 	}
 };
-customElements.get("edupage-messages-editor") || customElements.define("edupage-messages-editor", ze);
+customElements.get("edupage-messages-editor") || customElements.define("edupage-messages-editor", Be);
 //#endregion
 //#region src/messages-card.ts
-var Be = class extends J {
+var Ve = class extends J {
 	constructor(...e) {
-		super(...e), this.studentIndex = 0, this.dismiss = (e) => {
-			let t = this.renderRoot.querySelector(".student-picker");
-			t && !e.composedPath().includes(t) && (t.open = !1);
-		};
+		super(...e), this.studentIndex = 0, this.detailPointerOutside = !1;
 	}
 	static {
 		this.properties = {
 			hass: { attribute: !1 },
 			config: { state: !0 },
-			studentIndex: { state: !0 }
+			studentIndex: { state: !0 },
+			detail: { state: !0 }
 		};
 	}
 	static {
 		this.styles = [Ee, o`
     .messages-head { display:flex; gap:14px; align-items:center; justify-content:space-between; padding:20px; }
     .messages-head h2 { font-size:20px; min-width:0; overflow-wrap:anywhere; }
-    .messages-head .student-picker,.messages-head .student-static { flex-shrink:1; min-width:0; }
+    .messages-head edupage-student-picker { flex-shrink:1; min-width:0; }
     .messages-list { padding:0 16px 16px; }
     .notice { padding:12px 16px; margin:0 16px 12px; border-radius:10px; background:var(--secondary-background-color,#f1f5f7); font-size:13px; line-height:1.5; }
-    .school-message { border:1px solid var(--divider-color,#d9e1e6); border-radius:12px; margin:10px 0; overflow:hidden; }
-    .school-message > summary { cursor:pointer; list-style:none; padding:16px; }
-    .school-message > summary::-webkit-details-marker { display:none; }
+    .school-message { display:block; width:100%; text-align:left; color:inherit; background:transparent; border:1px solid var(--divider-color,#d9e1e6); border-radius:12px; margin:10px 0; padding:16px; }
+    .school-message:hover { background:var(--secondary-background-color,#f1f5f7); }
+    .message-detail { --detail-accent:var(--primary-color,#007b83); }
+    .message-detail .message-body { padding:18px 0 0; }
     .message-meta { display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; font-size:12px; color:var(--secondary-text-color,#687987); }
     .message-author { font-size:14px; font-weight:600; color:var(--primary-text-color,#182635); overflow-wrap:anywhere; }
     .message-preview { margin-top:9px; font-size:14px; line-height:1.5; overflow-wrap:anywhere; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
     .message-action { display:block; margin-top:10px; font-size:12px; color:var(--primary-color,#007b83); }
-    .when-open { display:none; }
-    .school-message[open] .when-open { display:inline; }
-    .school-message[open] .when-closed,.school-message[open] .message-preview { display:none; }
     .message-body { white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.65; font-size:14px; padding:0 16px 18px; }
     .message-count { padding:0 20px; font-size:12px; color:var(--secondary-text-color,#687987); }
-    @container(max-width:460px) { .messages-head { flex-wrap:wrap; } .messages-head .student-picker,.messages-head .student-static { margin-left:auto; } }
+    @container(max-width:460px) { .messages-head { flex-wrap:wrap; } .messages-head edupage-student-picker { margin-left:auto; } }
   `];
 	}
 	setConfig(e) {
-		Ie(e), this.config = { ...e }, this.studentIndex = 0;
+		Le(e), this.closeDetail(), this.config = { ...e }, this.studentIndex = 0;
 	}
 	static getConfigElement() {
 		return document.createElement("edupage-messages-editor");
@@ -1106,49 +1180,68 @@ var Be = class extends J {
 	t(e, t) {
 		return (this.config?.language ?? this.hass?.language ?? "en").startsWith("cs") ? e : t;
 	}
-	connectedCallback() {
-		super.connectedCallback(), document.addEventListener("pointerdown", this.dismiss);
+	async openDetail(e) {
+		if (this.detail = e, await this.updateComplete, !this.isConnected || this.detail !== e) return;
+		let t = this.renderRoot.querySelector(".detail");
+		t && !t.open && t.showModal();
+	}
+	closeDetail() {
+		this.renderRoot?.querySelector(".detail")?.close(), this.detail = void 0, this.detailPointerOutside = !1;
 	}
 	disconnectedCallback() {
-		super.disconnectedCallback(), document.removeEventListener("pointerdown", this.dismiss);
+		this.closeDetail(), super.disconnectedCallback();
 	}
-	closePicker() {
-		let e = this.renderRoot.querySelector(".student-picker");
-		e && (e.open = !1, e.querySelector("summary")?.focus());
+	outsideDetail(e) {
+		let t = e.currentTarget, n = t.getBoundingClientRect();
+		return e.target === t && (e.clientX < n.left || e.clientX > n.right || e.clientY < n.top || e.clientY > n.bottom);
 	}
 	render() {
 		if (!this.config || !this.hass) return L;
-		let e = Ie(this.config), t = e[this.studentIndex], n = (t) => String(e[t].name ?? this.hass.states[e[t].entity]?.attributes.student ?? this.hass.states[e[t].entity]?.attributes.friendly_name ?? e[t].entity), r = (e) => F`<span class="student-avatar" aria-hidden="true">${n(e).trim().slice(0, 1).toLocaleUpperCase()}</span><span class="student-name">${n(e)}</span>`, i = Re(this.hass.states[t.entity]), a = i.messages.slice(0, this.config.max_messages ?? 10);
+		let e = Le(this.config), t = e[this.studentIndex], n = (t) => String(e[t].name ?? this.hass.states[e[t].entity]?.attributes.student ?? this.hass.states[e[t].entity]?.attributes.friendly_name ?? e[t].entity), r = ze(this.hass.states[t.entity]), i = r.messages.slice(0, this.config.max_messages ?? 10);
 		return F`<ha-card>
       <div class="messages-head"><h2>${this.config.title ?? this.t("Zprávy ze školy", "School messages")}</h2>
-        ${this.config.show_student === !1 ? L : e.length === 1 ? F`<div class="student-static">${r(0)}</div>` : F`<details class="student-picker" @keydown=${(e) => {
-			e.key === "Escape" && (e.preventDefault(), e.stopPropagation(), this.closePicker());
-		}} @focusout=${(e) => {
-			e.currentTarget.contains(e.relatedTarget) || (e.currentTarget.open = !1);
-		}}>
-          <summary aria-label=${this.t("Vybrat dítě: ", "Choose student: ") + n(this.studentIndex)}>${r(this.studentIndex)}<svg class="student-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5" /></svg></summary>
-          <div class="student-options" role="group" aria-label=${this.t("Žák", "Student")}>${e.map((e, t) => F`<button class="student-option" aria-pressed=${t === this.studentIndex} @click=${() => {
-			this.studentIndex = t, this.closePicker();
-		}}>${r(t)}<span class="student-check" aria-hidden="true">${t === this.studentIndex ? "✓" : ""}</span></button>`)}</div>
-        </details>`}
+        ${this.config.show_student === !1 ? L : F`<edupage-student-picker
+          .names=${e.map((e, t) => n(t))} .selected=${this.studentIndex} .language=${this.config.language ?? this.hass.language}
+          .caption=${this.t("Zobrazit zprávy", "Show messages")}
+          @student-changed=${(e) => {
+			this.closeDetail(), this.studentIndex = e.detail.index;
+		}}></edupage-student-picker>`}
       </div>
-      ${i.unavailable ? F`<div class="notice" role="alert">${this.t("Senzor zpráv není dostupný. Zkontrolujte připojení konektoru.", "The message sensor is unavailable. Check the integration connection.")}</div>` : i.unsupported ? F`<div class="notice" role="alert">${this.t("Senzor neposkytuje seznam událostí. Vyberte senzor oznámení EduPage s atributem events.", "The sensor does not provide an event list. Select an EduPage notification sensor with the events attribute.")}</div>` : F`
-        ${i.stale ? F`<div class="notice" role="status">${this.t("Údaje mohou být zastaralé. Zobrazuje se poslední dostupná historie.", "Data may be stale. Showing the last available history.")}</div>` : L}
-        ${i.truncated ? F`<div class="notice">${this.t("Konektor poskytuje jen část historie. Starší zprávy zde mohou chybět.", "The integration provides only part of the history. Older messages may be missing.")}</div>` : L}
-        <div class="message-count">${this.t("Zobrazeno", "Showing")} ${a.length} ${this.t("z", "of")} ${i.messages.length} ${this.t("dostupných zpráv", "available messages")}</div>
-        ${Fe(t.entity, F`<div class="messages-list">${a.length ? a.map((e) => Fe(e.key, F`<details class="school-message">
-          <summary><span class="message-meta"><span class="message-author">${e.author || this.t("Odesílatel neuveden", "Sender unavailable")}</span><span>${Le(e.timestamp, this.config.language ?? this.hass.language) || this.t("Datum neuvedeno", "Date unavailable")}</span></span>
-          <div class="message-preview">${(e.text.length > 200 ? e.text.slice(0, 200) + "…" : e.text) || this.t("Text zprávy není dostupný.", "Message text is unavailable.")}</div><span class="message-action"><span class="when-closed">${this.t("Číst zprávu", "Read message")} ↓</span><span class="when-open">${this.t("Sbalit", "Collapse")} ↑</span></span></summary>
-          <div class="message-body">${e.text || this.t("Text zprávy není dostupný.", "Message text is unavailable.")}</div>
-        </details>`)) : F`<div class="empty">${this.t("V dostupné historii nejsou žádné zprávy.", "There are no messages in the available history.")}</div>`}</div>`)}
+      ${r.unavailable ? F`<div class="notice" role="alert">${this.t("Senzor zpráv není dostupný. Zkontrolujte připojení konektoru.", "The message sensor is unavailable. Check the integration connection.")}</div>` : r.unsupported ? F`<div class="notice" role="alert">${this.t("Senzor neposkytuje seznam událostí. Vyberte senzor oznámení EduPage s atributem events.", "The sensor does not provide an event list. Select an EduPage notification sensor with the events attribute.")}</div>` : F`
+        ${r.stale ? F`<div class="notice" role="status">${this.t("Údaje mohou být zastaralé. Zobrazuje se poslední dostupná historie.", "Data may be stale. Showing the last available history.")}</div>` : L}
+        ${r.truncated ? F`<div class="notice">${this.t("Konektor poskytuje jen část historie. Starší zprávy zde mohou chybět.", "The integration provides only part of the history. Older messages may be missing.")}</div>` : L}
+        <div class="message-count">${this.t("Zobrazeno", "Showing")} ${i.length} ${this.t("z", "of")} ${r.messages.length} ${this.t("dostupných zpráv", "available messages")}</div>
+        ${Ie(t.entity, F`<div class="messages-list">${i.length ? i.map((e) => Ie(e.key, F`<button class="school-message" @click=${() => void this.openDetail(e)}>
+          <span class="message-meta"><span class="message-author">${e.author || this.t("Odesílatel neuveden", "Sender unavailable")}</span><span>${Re(e.timestamp, this.config.language ?? this.hass.language) || this.t("Datum neuvedeno", "Date unavailable")}</span></span>
+          <div class="message-preview">${(e.text.length > 200 ? e.text.slice(0, 200) + "…" : e.text) || this.t("Text zprávy není dostupný.", "Message text is unavailable.")}</div><span class="message-action">${this.t("Číst zprávu", "Read message")} →</span>
+        </button>`)) : F`<div class="empty">${this.t("V dostupné historii nejsou žádné zprávy.", "There are no messages in the available history.")}</div>`}</div>`)}
       `}
+      ${this.detail ? F`<dialog class="detail message-detail" aria-labelledby="message-detail-title"
+        @cancel=${(e) => {
+			e.preventDefault(), e.stopPropagation(), this.closeDetail();
+		}}
+        @close=${() => {
+			this.detail = void 0;
+		}}
+        @pointerdown=${(e) => {
+			this.detailPointerOutside = this.outsideDetail(e);
+		}}
+        @click=${(e) => {
+			this.detailPointerOutside && this.outsideDetail(e) && this.closeDetail();
+		}}>
+        <div class="detail-head"><div><div class="eyebrow">${this.t("ZPRÁVA PRO", "MESSAGE FOR")} ${n(this.studentIndex)}</div>
+          <h3 id="message-detail-title">${this.detail.author || this.t("Odesílatel neuveden", "Sender unavailable")}</h3></div>
+          <button class="tool detail-close" autofocus aria-label=${this.t("Zavřít zprávu", "Close message")} @click=${this.closeDetail}>×</button></div>
+        <div class="message-meta">${Re(this.detail.timestamp, this.config.language ?? this.hass.language) || this.t("Datum neuvedeno", "Date unavailable")}</div>
+        <div class="message-body">${this.detail.text || this.t("Text zprávy není dostupný.", "Message text is unavailable.")}</div>
+      </dialog>` : L}
       <footer>${this.t("Zobrazení zprávy zde nemění stav přečtení v EduPage.", "Viewing a message here does not mark it as read in EduPage.")}</footer>
     </ha-card>`;
 	}
 };
-customElements.get("edupage-messages-card") || customElements.define("edupage-messages-card", Be);
-var Ve = window;
-Ve.customCards ??= [], Ve.customCards.push({
+customElements.get("edupage-messages-card") || customElements.define("edupage-messages-card", Ve);
+var He = window;
+He.customCards ??= [], He.customCards.push({
 	type: "edupage-messages-card",
 	name: "EduPage Messages",
 	description: "School messages from EduPage notification sensors.",
@@ -1156,12 +1249,9 @@ Ve.customCards ??= [], Ve.customCards.push({
 });
 //#endregion
 //#region src/index.ts
-var He = class extends J {
+var Ue = class extends J {
 	constructor(...e) {
-		super(...e), this.week = "", this.studentIndex = 0, this.selectedDay = 0, this.now = /* @__PURE__ */ new Date(), this.calendar = new Te(this), this.detailPointerOutside = !1, this.dismissStudentPicker = (e) => {
-			let t = this.renderRoot.querySelector(".student-picker");
-			t && !e.composedPath().includes(t) && (t.open = !1);
-		};
+		super(...e), this.week = "", this.studentIndex = 0, this.selectedDay = 0, this.now = /* @__PURE__ */ new Date(), this.calendar = new Te(this), this.detailPointerOutside = !1;
 	}
 	static {
 		this.styles = Ee;
@@ -1189,24 +1279,6 @@ var He = class extends J {
 		let t = e.currentTarget, n = t.getBoundingClientRect();
 		return e.target === t && (e.clientX < n.left || e.clientX > n.right || e.clientY < n.top || e.clientY > n.bottom);
 	}
-	closeStudentPicker(e = !1) {
-		let t = this.renderRoot.querySelector(".student-picker");
-		t && (t.open = !1, e && t.querySelector("summary")?.focus());
-	}
-	studentKeys(e) {
-		let t = e.currentTarget;
-		if (e.key === "Escape") e.preventDefault(), e.stopPropagation(), this.closeStudentPicker(!0);
-		else if ([
-			"ArrowDown",
-			"ArrowUp",
-			"Home",
-			"End"
-		].includes(e.key)) {
-			e.preventDefault(), t.open = !0;
-			let n = [...t.querySelectorAll(".student-option")], r = n.indexOf(this.shadowRoot?.activeElement);
-			n[e.key === "Home" ? 0 : e.key === "End" ? n.length - 1 : r < 0 ? e.key === "ArrowUp" ? n.length - 1 : 0 : (r + (e.key === "ArrowDown" ? 1 : -1) + n.length) % n.length]?.focus();
-		}
-	}
 	setConfig(e) {
 		$(e), De(e.subject_colors), this.config = { ...e }, this.studentIndex = 0, this.week = "", this.detail = void 0;
 	}
@@ -1230,12 +1302,12 @@ var He = class extends J {
 		};
 	}
 	connectedCallback() {
-		super.connectedCallback(), document.addEventListener("pointerdown", this.dismissStudentPicker), this.now = /* @__PURE__ */ new Date(), this.timer = setInterval(() => {
+		super.connectedCallback(), this.now = /* @__PURE__ */ new Date(), this.timer = setInterval(() => {
 			this.now = /* @__PURE__ */ new Date();
 		}, 3e4);
 	}
 	disconnectedCallback() {
-		this.closeDetail(), super.disconnectedCallback(), clearInterval(this.timer), document.removeEventListener("pointerdown", this.dismissStudentPicker), this.closeStudentPicker();
+		this.closeDetail(), super.disconnectedCallback(), clearInterval(this.timer);
 	}
 	willUpdate(e) {
 		if (!this.hass || !this.config) return;
@@ -1292,29 +1364,11 @@ var He = class extends J {
 		}}>↻</button>
         </div>
       ${this.config.show_student === !1 ? L : F`<div class="student-row">
-        ${n.length > 1 ? F`<details class="student-picker" @keydown=${this.studentKeys}
-          @focusout=${(e) => {
-			e.currentTarget.contains(e.relatedTarget) || this.closeStudentPicker();
-		}}>
-          <summary aria-label=${`${this.t("Vybrat dítě", "Choose student")}: ${r(this.studentIndex)}`}>
-            <span class="student-avatar" aria-hidden="true">${r(this.studentIndex).trim().slice(0, 1).toLocaleUpperCase()}</span>
-            <span class="student-name">${r(this.studentIndex)}</span>
-            <svg class="student-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5" /></svg>
-          </summary>
-          <div class="student-options" role="group" aria-label=${this.t("Dítě", "Student")}>
-            <span class="student-caption">${this.t("Zobrazit rozvrh", "Show timetable")}</span>
-            ${n.map((e, t) => F`<button class="student-option" aria-pressed=${t === this.studentIndex}
-              @click=${() => {
-			this.studentIndex = t, this.detail = void 0, this.closeStudentPicker(!0);
-		}}>
-              <span class="student-avatar" aria-hidden="true">${r(t).trim().slice(0, 1).toLocaleUpperCase()}</span>
-              <span class="student-name">${r(t)}</span><span class="student-check" aria-hidden="true">${t === this.studentIndex ? "✓" : ""}</span>
-            </button>`)}
-          </div>
-        </details>` : F`<div class="student-static">
-              <span class="student-avatar" aria-hidden="true">${r(this.studentIndex).trim().slice(0, 1).toLocaleUpperCase()}</span>
-              <span class="student-name">${r(this.studentIndex)}</span>
-            </div>`}
+        <edupage-student-picker .names=${n.map((e, t) => r(t))} .selected=${this.studentIndex}
+          .language=${this.cs ? "cs" : "en"} .caption=${this.t("Zobrazit rozvrh", "Show timetable")}
+          @student-changed=${(e) => {
+			this.closeDetail(), this.studentIndex = e.detail.index;
+		}}></edupage-student-picker>
       </div>`}
       </div>
       ${this.calendar.loading ? F`<div class="message" role="status">${this.t("Načítám rozvrh…", "Loading timetable…")}</div>` : this.calendar.error ? F`<div class="message" role="alert">${this.t("Rozvrh se nepodařilo načíst. Zkontrolujte dostupnost kalendáře v HA.", "Could not load the timetable. Check that the calendar is available in HA.")}<br><button class="tool" @click=${() => void this.calendar.refresh()}>${this.t("Zkusit znovu", "Try again")}</button></div>` : F`<div class="desktop"><div class="grid">
@@ -1364,13 +1418,13 @@ var He = class extends J {
     </ha-card>`;
 	}
 };
-customElements.get("edupage-timetable-card") || customElements.define("edupage-timetable-card", He);
-var Ue = window;
-Ue.customCards ??= [], Ue.customCards.push({
+customElements.get("edupage-timetable-card") || customElements.define("edupage-timetable-card", Ue);
+var We = window;
+We.customCards ??= [], We.customCards.push({
 	type: "edupage-timetable-card",
 	name: "EduPage Timetable",
 	description: "A weekly school timetable with a mobile daily view.",
 	preview: !0
 });
 //#endregion
-export { He as EdupageTimetableCard };
+export { Ue as EdupageTimetableCard };
