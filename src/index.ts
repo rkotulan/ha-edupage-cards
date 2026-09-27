@@ -8,6 +8,7 @@ import { lessonColors, validateColors } from './colors';
 import './editor';
 import './student-picker';
 import './messages-card';
+import './grades-card';
 
 export class EdupageTimetableCard extends LitElement {
   static styles = styles;

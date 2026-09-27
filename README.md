@@ -132,3 +132,24 @@ For a single student, use `entity` or a one-item `students` list. The visual edi
 Open a message to read its full available text in a dialog (a bottom sheet on mobile). Close it with Escape, the close button or a click outside. Both cards use the same student selector with keyboard navigation. Content is displayed as plain text, never executed as HTML. Attachments, replies and EduPage read receipts are not supported. Viewing a message does not mark it as read in EduPage. Messages update when HA updates the sensor; the card does not trigger additional EduPage requests.
 
 The sensor can provide only part of the history. The card displays `events_truncated` and `data_stale` warnings, differentiates unavailable/unsupported sensors from an empty history, and does not claim to show all messages or an unread count. Timestamps without a timezone are displayed as supplied by the connector, without conversion to the browser timezone.
+
+## Grades card
+
+`custom:edupage-grades-card` reads the integration's per-subject grade sensors. It offers newest-first and subject-grouped views, the shared student picker, and a detail dialog with the assessment title, date, teacher, comment and optional percentage, maximum points and class average.
+
+```yaml
+type: custom:edupage-grades-card
+students:
+  - name: Student
+    subjects:
+      - entity: sensor.edupage_student_mathematics
+        name: Mathematics
+      - entity: sensor.edupage_student_english
+        name: English
+language: en
+default_view: latest
+```
+
+The visual editor can discover students with available grades, rename/reorder/remove them and select subject sensors. `students` lists exact sensors to keep each student's data separate. Add newly available subjects in the editor; they are not silently added to existing configurations. Subject names may be overridden with `name`. Optional `title`, `show_student` (default true), `language` (HA default) and `default_view` (`latest` or `subjects`) control presentation. The first student is the default.
+
+The card shows all assessments exposed by the selected sensors, not an unread count or a guarantee of complete school history. It preserves textual marks and displays unavailable, unsupported and stale data separately. Grade weights are not exposed by the connector, so no student average is calculated. A class average, when supplied, belongs to that individual assessment. No additional EduPage requests are made.
