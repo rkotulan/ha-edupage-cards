@@ -70,7 +70,8 @@ For a single calendar, use `entity: calendar.edupage_student` instead of `studen
 | --- | --- | --- |
 | `entity` | — | One timetable calendar; required unless `students` is supplied |
 | `students` | — | List of `{ entity, name? }`; takes precedence over `entity` |
-| `title` | Localized “Timetable” | Card heading |
+| `title` | Localized “Timetable” | Optional card heading, visible when `show_title` is enabled |
+| `show_title` | `false` | Show the card heading above navigation |
 | `language` | HA language | `cs` or `en`; other HA languages fall back to English |
 | `show_weekend` | `false` | Include Saturday and Sunday |
 | `available_days` | `14` | Available days starting today, matching the integration's cache |

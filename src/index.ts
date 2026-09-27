@@ -159,7 +159,15 @@ export class EdupageTimetableCard extends LitElement {
       : this.t('Mimo dostupný rozsah konektoru.', 'Outside the integration’s available range.');
     const dayLessons = (day: string) => lessons.filter(l => l.day === day);
     return html`<ha-card>
-      <header><div><div class="eyebrow">EDUPAGE · ${this.t('ŠKOLNÍ PŘEHLED', 'SCHOOL OVERVIEW')}</div><h2>${this.config.title ?? this.t('Rozvrh', 'Timetable')}</h2></div>
+      ${this.config.show_title ? html`<h2 class="card-title">${this.config.title ?? this.t('Rozvrh', 'Timetable')}</h2>` : nothing}
+      <div class="toolbar">
+        <div class="navigation"><button class="tool arrow" aria-label=${this.t('Předchozí týden', 'Previous week')} ?disabled=${addDays(this.week, count - 8) < today} @click=${() => this.move(-1)}>‹</button>
+          <button class="tool" @click=${() => { this.week = ''; this.detail = undefined; }}>${this.t('Dnes', 'Today')}</button>
+          <button class="tool arrow" aria-label=${this.t('Další týden', 'Next week')} ?disabled=${addDays(this.week, 7) > lastDay} @click=${() => this.move(1)}>›</button></div>
+        <span class="range">${this.format(this.week)} – ${this.format(addDays(this.week, count - 1))} <span class="muted">${this.week.slice(0, 4)}</span></span>
+        <button class="tool refresh" aria-label=${this.t('Obnovit rozvrh', 'Refresh timetable')} @click=${() => { this.detail = undefined; void this.calendar.refresh(); }}>↻</button>
+      </div>
+      <div class="student-row">
         ${people.length > 1 ? html`<details class="student-picker" @keydown=${this.studentKeys}
           @focusout=${(e: FocusEvent) => { if (!(e.currentTarget as HTMLElement).contains(e.relatedTarget as Node | null)) this.closeStudentPicker(); }}>
           <summary aria-label=${`${this.t('Vybrat dítě', 'Choose student')}: ${studentName(this.studentIndex)}`}>
@@ -177,12 +185,6 @@ export class EdupageTimetableCard extends LitElement {
           </div>
         </details>`
           : html`<span class="badge">${chosen.name ?? this.hass.states[chosen.entity]?.attributes.friendly_name ?? chosen.entity}</span>`}
-      </header>
-      <div class="toolbar"><span class="range">${this.format(this.week)} – ${this.format(addDays(this.week, count - 1))} <span class="muted">${this.week.slice(0, 4)}</span></span>
-        <div class="navigation"><button class="tool arrow" aria-label=${this.t('Předchozí týden', 'Previous week')} ?disabled=${addDays(this.week, count - 8) < today} @click=${() => this.move(-1)}>‹</button>
-          <button class="tool" @click=${() => { this.week = ''; this.detail = undefined; }}>${this.t('Dnes', 'Today')}</button>
-          <button class="tool arrow" aria-label=${this.t('Další týden', 'Next week')} ?disabled=${addDays(this.week, 7) > lastDay} @click=${() => this.move(1)}>›</button>
-          <button class="tool" aria-label=${this.t('Obnovit rozvrh', 'Refresh timetable')} @click=${() => { this.detail = undefined; void this.calendar.refresh(); }}>↻</button></div>
       </div>
       ${this.calendar.loading ? html`<div class="message" role="status">${this.t('Načítám rozvrh…', 'Loading timetable…')}</div>`
         : this.calendar.error ? html`<div class="message" role="alert">${this.t('Rozvrh se nepodařilo načíst. Zkontrolujte dostupnost kalendáře v HA.', 'Could not load the timetable. Check that the calendar is available in HA.')}<br><button class="tool" @click=${() => void this.calendar.refresh()}>${this.t('Zkusit znovu', 'Try again')}</button></div>`

@@ -656,7 +656,8 @@ var we = class {
   button { cursor: pointer; }
   button:focus-visible, summary:focus-visible { outline: 2px solid var(--primary-color, #007b83); outline-offset: 3px; }
   button:disabled { opacity: .35; cursor: default; }
-  header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 24px 14px; flex-wrap: wrap; }
+  .card-title { padding: 22px 24px 0; overflow-wrap: anywhere; }
+  .student-row { display: flex; justify-content: flex-end; padding: 0 24px 14px; min-width: 0; }
   .eyebrow { font-size: 10px; letter-spacing: .16em; font-weight: 700; color: var(--secondary-text-color, #687987); margin-bottom: 5px; }
   h2 { font-size: 23px; letter-spacing: -.03em; line-height: 1.2; margin: 0; font-weight: 650; }
   .student-picker { position: relative; max-width: 100%; font-size: 14px; }
@@ -674,13 +675,13 @@ var we = class {
   .student-option:hover { background: var(--secondary-background-color, #f6f8fa); }
   .student-option[aria-pressed=true] { background: color-mix(in srgb, var(--primary-color, #007b83) 12%, transparent); font-weight: 600; }
   .student-check { margin-left: auto; min-width: 18px; color: var(--primary-color, #007b83); }
-  .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 4px 24px 18px; flex-wrap: wrap; }
+  .toolbar { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 18px 24px 12px; }
   .navigation { display: flex; align-items: center; gap: 7px; }
   .tool { border: 1px solid var(--divider-color, #d9e1e6); background: transparent; border-radius: 9px; padding: 7px 12px; min-height: 36px; }
   .arrow { font-size: 19px; line-height: 20px; }
   .range { font-size: 14px; font-weight: 600; }
   .muted, footer { color: var(--secondary-text-color, #687987); }
-  .badge { font-size: 11px; background: var(--secondary-background-color, #f0f5f6); border-radius: 6px; padding: 5px 8px; }
+  .badge { font-size: 11px; background: var(--secondary-background-color, #f0f5f6); border-radius: 6px; padding: 5px 8px; overflow-wrap: anywhere; min-width: 0; }
   .desktop { overflow-x: auto; padding: 0 20px 12px; }
   .grid { min-width: 800px; }
   .row { display: grid; grid-template-columns: 70px 1fr; border-top: 1px solid var(--divider-color, #e7edf0); }
@@ -731,13 +732,18 @@ var we = class {
   .mobile .lesson strong { font-size: 15px; }
   .mobile .lesson .teacher, .mobile .lesson .meta { font-size: 12px; }
   @container (max-width: 680px) {
-    header { padding: 18px 16px 12px; gap: 12px; }
+    .card-title { padding: 18px 16px 0; }
+    .student-row { padding: 0 16px 12px; }
     h2 { font-size: 21px; }
-    .toolbar { padding: 0 16px 16px; }
+    .toolbar { padding: 16px 16px 12px; gap: 10px; }
     .desktop { display: none; }
     .mobile { display: block; }
-    .range { width: 100%; }
     footer { padding: 12px 16px 16px; }
+  }
+  @container (max-width: 460px) {
+    .toolbar { grid-template-columns: 1fr auto; }
+    .range { grid-row: 2; grid-column: 1 / -1; }
+    .refresh { grid-row: 1; grid-column: 2; }
   }
 `;
 //#endregion
@@ -893,7 +899,19 @@ var Oe = class extends J {
 		if (!this.config || !this.hass || !this.week) return z;
 		let e = Y(this.now, this.hass.config.time_zone), t = X(e, (this.config.available_days ?? 14) - 1), n = $(this.config), r = n[this.studentIndex], i = (e) => String(n[e].name ?? this.hass.states[n[e].entity]?.attributes.friendly_name ?? n[e].entity), a = this.config.show_weekend ? 7 : 5, o = Array.from({ length: a }, (e, t) => X(this.week, t)), s = (n) => n >= e && n <= t, c = be(this.calendar.events, this.week, this.hass.config.time_zone).filter((e) => s(e.day)), { start: l, end: u } = Ce(c), d = Array.from({ length: (u - l) / 60 + 1 }, (e, t) => l + t * 60), f = (e) => s(e) ? this.t("Kalendář nevrátil žádné události.", "The calendar returned no events.") : this.t("Mimo dostupný rozsah konektoru.", "Outside the integration’s available range."), p = (e) => c.filter((t) => t.day === e);
 		return L`<ha-card>
-      <header><div><div class="eyebrow">EDUPAGE · ${this.t("ŠKOLNÍ PŘEHLED", "SCHOOL OVERVIEW")}</div><h2>${this.config.title ?? this.t("Rozvrh", "Timetable")}</h2></div>
+      ${this.config.show_title ? L`<h2 class="card-title">${this.config.title ?? this.t("Rozvrh", "Timetable")}</h2>` : z}
+      <div class="toolbar">
+        <div class="navigation"><button class="tool arrow" aria-label=${this.t("Předchozí týden", "Previous week")} ?disabled=${X(this.week, a - 8) < e} @click=${() => this.move(-1)}>‹</button>
+          <button class="tool" @click=${() => {
+			this.week = "", this.detail = void 0;
+		}}>${this.t("Dnes", "Today")}</button>
+          <button class="tool arrow" aria-label=${this.t("Další týden", "Next week")} ?disabled=${X(this.week, 7) > t} @click=${() => this.move(1)}>›</button></div>
+        <span class="range">${this.format(this.week)} – ${this.format(X(this.week, a - 1))} <span class="muted">${this.week.slice(0, 4)}</span></span>
+        <button class="tool refresh" aria-label=${this.t("Obnovit rozvrh", "Refresh timetable")} @click=${() => {
+			this.detail = void 0, this.calendar.refresh();
+		}}>↻</button>
+      </div>
+      <div class="student-row">
         ${n.length > 1 ? L`<details class="student-picker" @keydown=${this.studentKeys}
           @focusout=${(e) => {
 			e.currentTarget.contains(e.relatedTarget) || this.closeStudentPicker();
@@ -914,16 +932,6 @@ var Oe = class extends J {
             </button>`)}
           </div>
         </details>` : L`<span class="badge">${r.name ?? this.hass.states[r.entity]?.attributes.friendly_name ?? r.entity}</span>`}
-      </header>
-      <div class="toolbar"><span class="range">${this.format(this.week)} – ${this.format(X(this.week, a - 1))} <span class="muted">${this.week.slice(0, 4)}</span></span>
-        <div class="navigation"><button class="tool arrow" aria-label=${this.t("Předchozí týden", "Previous week")} ?disabled=${X(this.week, a - 8) < e} @click=${() => this.move(-1)}>‹</button>
-          <button class="tool" @click=${() => {
-			this.week = "", this.detail = void 0;
-		}}>${this.t("Dnes", "Today")}</button>
-          <button class="tool arrow" aria-label=${this.t("Další týden", "Next week")} ?disabled=${X(this.week, 7) > t} @click=${() => this.move(1)}>›</button>
-          <button class="tool" aria-label=${this.t("Obnovit rozvrh", "Refresh timetable")} @click=${() => {
-			this.detail = void 0, this.calendar.refresh();
-		}}>↻</button></div>
       </div>
       ${this.calendar.loading ? L`<div class="message" role="status">${this.t("Načítám rozvrh…", "Loading timetable…")}</div>` : this.calendar.error ? L`<div class="message" role="alert">${this.t("Rozvrh se nepodařilo načíst. Zkontrolujte dostupnost kalendáře v HA.", "Could not load the timetable. Check that the calendar is available in HA.")}<br><button class="tool" @click=${() => void this.calendar.refresh()}>${this.t("Zkusit znovu", "Try again")}</button></div>` : L`<div class="desktop"><div class="grid">
           <div class="axis">${d.map((e) => L`<span class="tick" style=${`left:${(e - l) / (u - l) * 100}%`}>${Q(e)}</span>`)}</div>
