@@ -23,6 +23,7 @@ export class EdupageMessagesCard extends LitElement {
     .school-message { display:block; width:100%; text-align:left; color:inherit; background:transparent; border:1px solid var(--divider-color,#d9e1e6); border-radius:12px; margin:10px 0; padding:16px; }
     .school-message:hover { background:var(--secondary-background-color,#f1f5f7); }
     .message-detail { --detail-accent:var(--primary-color,#007b83); }
+    @media (min-width: 601px) { .message-detail { width:min(760px, calc(100vw - 32px)); } }
     .message-detail .message-body { padding:18px 0 0; }
     .message-meta { display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; font-size:12px; color:var(--secondary-text-color,#687987); }
     .message-author { font-size:14px; font-weight:600; color:var(--primary-text-color,#182635); overflow-wrap:anywhere; }
