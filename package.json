@@ -1,6 +1,6 @@
 {
   "name": "ha-edupage-cards",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "EduPage timetable and family overview cards for Home Assistant",
   "main": "dist/edupage-cards.js",
   "scripts": {

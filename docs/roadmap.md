@@ -1,21 +1,20 @@
 # Roadmap
 
-## 1. Timetable data contract
+## Available in 0.3.0
 
-Inspect the integration's calendar output and document available fields, time zone handling, all-day events, and the available date range. Identify any integration changes needed for period numbers, groups, cancellations, and substitutions.
+- Responsive timetable with actual lesson times, holidays, overlaps, subject colors and lesson details.
+- Shared student selector and visual editors for all three cards.
+- School messages with a desktop dialog/mobile bottom sheet, partial-history and stale-data notices.
+- Grades in newest-first or subject-grouped views, preserving textual assessments and showing available details.
+- Family dashboards composed from one section per child, with synthetic configuration examples.
+- Local Home Assistant verification on desktop/mobile and tests for data parsing, missing data, time zones and request races.
 
-## 2. First working card
+## Future work
 
-Set up TypeScript, Lit, a reproducible browser build, and tests for timetable layout logic. Implement `edupage-timetable-card` with a configurable calendar entity, week navigation, lesson details, and responsive layouts.
+- Attendance overview based on data available from the integration.
+- Message attachments after verifying authentication and the source data contract; deferred for now.
+- Richer timetable metadata (period numbers, groups and substitutions) where the integration supports it.
+- Grade weights and accurate averages only when the source provides the required data.
+- More complete message history through integration endpoints rather than oversized sensor attributes.
 
-Keep lesson placement based on actual times. Do not merge unrelated adjacent lessons merely because they have the same subject. Render unavailable data distinctly from a confirmed empty day.
-
-## 3. Home Assistant validation
-
-Verify both family accounts, multi-period lessons, gaps, holidays, overlapping lessons, light/dark themes, and phone layouts. Deploy for local testing before publishing an installable release.
-
-## 4. Family overview
-
-Add student selection and explore separate cards for grades, messages with attachments, and attendance. Message history and attachment access may require integration endpoints rather than larger sensor attributes.
-
-Reading a message in a card must not implicitly send an EduPage receipt or confirmation.
+Reading a message must not implicitly send an EduPage receipt or confirmation. Missing data must remain distinct from an empty timetable or inbox. Use synthetic fixtures and screenshots in the public repository.
