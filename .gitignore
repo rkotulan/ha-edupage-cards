@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+*.log
+.env
+.env.*
+!.env.example
+deploy.local.json
+.codex-remote-attachments/
+.DS_Store
+Thumbs.db
