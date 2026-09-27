@@ -1,7 +1,7 @@
 import { css } from 'lit';
 
 export const styles = css`
-  :host { display: block; container-type: inline-size; color: var(--primary-text-color, #182635); }
+  :host { --lesson-height: 88px; --lane-height: 98px; display: block; container-type: inline-size; color: var(--primary-text-color, #182635); }
   * { box-sizing: border-box; }
   ha-card { display: block; overflow: visible; background: var(--ha-card-background, var(--card-background-color, #fff)); border-radius: var(--ha-card-border-radius, 18px); }
   button, select { font: inherit; color: inherit; }
@@ -45,12 +45,12 @@ export const styles = css`
   .day-label span { font-size: 11px; color: var(--secondary-text-color, #687987); }
   .today .day-label strong { color: var(--primary-color, #007b83); }
   .today { background: color-mix(in srgb, var(--primary-color, #007b83) 5%, transparent); }
-  .track { position: relative; min-height: 94px; background: repeating-linear-gradient(to right, var(--divider-color, #e7edf0) 0 1px, transparent 1px var(--hour-width)); }
-  .lesson { position: absolute; top: calc(7px + var(--lane) * 86px); left: var(--left); width: var(--width); height: 77px; padding: 8px; text-align: left; border: 1px solid var(--lesson-border); border-left: 3px solid var(--lesson-accent); border-radius: 7px; overflow: hidden; background: var(--lesson-bg); color: var(--lesson-text); display: flex; flex-direction: column; gap: 3px; }
+  .track { position: relative; min-height: calc(var(--lane-height) + 8px); background: repeating-linear-gradient(to right, var(--divider-color, #e7edf0) 0 1px, transparent 1px var(--hour-width)); }
+  .lesson { position: absolute; top: calc(7px + var(--lane) * var(--lane-height)); left: var(--left); width: var(--width); height: var(--lesson-height); padding: 8px; text-align: left; border: 1px solid var(--lesson-border); border-left: 3px solid var(--lesson-accent); border-radius: 7px; overflow: hidden; background: var(--lesson-bg); color: var(--lesson-text); display: flex; flex-direction: column; gap: 3px; }
   .lesson:hover { filter: brightness(.96); }
-  .lesson .meta { display: flex; justify-content: space-between; gap: 5px; font-size: 10px; white-space: nowrap; }
-  .lesson strong { font-size: 12px; line-height: 1.2; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-  .lesson .teacher { font-size: 10px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; margin-top: auto; }
+  .lesson .meta { display: flex; justify-content: space-between; gap: 5px; font-size: 10px; line-height: 1.4; flex-shrink: 0; white-space: nowrap; }
+  .lesson strong { flex-shrink: 0; font-size: 12px; line-height: 1.25; max-height: 2.5em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .lesson .teacher { flex-shrink: 0; font-size: 10px; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; margin-top: auto; }
   .lesson.current { outline: 2px solid var(--primary-color, #007b83); outline-offset: -2px; }
   .lesson.cancelled { opacity: .7; color: var(--primary-text-color, #182635); background: var(--secondary-background-color, #eee); border-color: var(--divider-color, #ccc); }
   .lesson.cancelled strong { text-decoration: line-through; }

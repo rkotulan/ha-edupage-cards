@@ -170,7 +170,7 @@ export class EdupageTimetableCard extends LitElement {
             <div class="row ${day === today ? 'today' : ''} ${available(day) ? '' : 'outside'}">
               <div class="day-label"><strong>${this.format(day, true)}</strong><span>${this.format(day)}</span></div>
               <div class="day-content">${list.filter(l => l.allDay).map(l => this.lesson(l, start, end, today))}
-                ${placed.lessons.length ? html`<div class="track" style=${`height:${placed.lanes * 86 + 8}px;--hour-width:${60 / (end - start) * 100}%`}>${placed.lessons.map(l => this.lesson(l, start, end, today))}</div>`
+                ${placed.lessons.length ? html`<div class="track" style=${`height:calc(${placed.lanes} * var(--lane-height) + 8px);--hour-width:${60 / (end - start) * 100}%`}>${placed.lessons.map(l => this.lesson(l, start, end, today))}</div>`
                   : list.length ? nothing : html`<div class="empty">${empty(day)}</div>`}</div>
             </div>`; })}
         </div></div>
