@@ -63,6 +63,18 @@ For a single calendar, use `entity: calendar.edupage_student` instead of `studen
 | `show_weekend` | `false` | Include Saturday and Sunday |
 | `available_days` | `14` | Available days starting today, matching the integration's cache |
 | `subject_labels` | `{}` | Map full subject names to shorter labels; detail retains the full title |
+| `subject_colors` | `{}` | Map full subject names to quoted `#RGB` or `#RRGGBB` background colors |
+
+For example, add this to the card configuration:
+
+```yaml
+subject_colors:
+  Matematika: "#90caf9"
+  Český jazyk: "#a5d6a7"
+  Anglický jazyk: "#ffe082"
+```
+
+Names match the original full subject title (with surrounding whitespace ignored), not `subject_labels`. The mapping applies to all configured students. Subjects without an override keep their automatic colors. Text switches between black and white for contrast; cancelled lessons retain their neutral appearance. Quote hex colors in YAML, otherwise `#` starts a comment. Color configuration is YAML-only in this version.
 
 ## Development
 

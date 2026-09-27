@@ -1,9 +1,10 @@
 import { LitElement, html, nothing } from 'lit';
 import type { PropertyValues } from 'lit';
 import { CalendarController } from './calendar-controller';
-import { addDays, axis, clock, dateKey, hue, initialWeek, layout, minutes, normalize, students } from './timetable';
+import { addDays, axis, clock, dateKey, initialWeek, layout, minutes, normalize, students } from './timetable';
 import type { HomeAssistant, Lesson, TimetableConfig } from './types';
 import { styles } from './styles';
+import { lessonColors, validateColors } from './colors';
 
 export class EdupageTimetableCard extends LitElement {
   static styles = styles;
@@ -23,6 +24,7 @@ export class EdupageTimetableCard extends LitElement {
 
   setConfig(config: TimetableConfig): void {
     students(config);
+    validateColors(config.subject_colors);
     this.config = { ...config };
     this.studentIndex = 0;
     this.week = '';
@@ -74,8 +76,9 @@ export class EdupageTimetableCard extends LitElement {
     const current = lesson.day === today && !lesson.cancelled && !lesson.allDay &&
       minutes(this.now, this.hass!.config.time_zone) >= lesson.start && minutes(this.now, this.hass!.config.time_zone) < lesson.end;
     const label = this.config?.subject_labels?.[lesson.title] ?? lesson.title;
+    const colors = lessonColors(lesson.title, this.config?.subject_colors);
     return html`<button class="lesson ${lesson.allDay ? 'all-day' : ''} ${lesson.cancelled ? 'cancelled' : ''} ${current ? 'current' : ''}"
-      style=${`--hue:${hue(lesson.title)};--lane:${lesson.lane};--left:${(lesson.start - start) / (end - start) * 100}%;--width:calc(${(lesson.end - lesson.start) / (end - start) * 100}% - 3px)`}
+      style=${`--lesson-bg:${colors.background};--lesson-text:${colors.text};--lesson-border:${colors.border};--lesson-accent:${colors.accent};--lane:${lesson.lane};--left:${(lesson.start - start) / (end - start) * 100}%;--width:calc(${(lesson.end - lesson.start) / (end - start) * 100}% - 3px)`}
       aria-label=${`${lesson.title}, ${this.format(lesson.day)}, ${lesson.allDay ? this.t('Celý den', 'All day') : clock(lesson.start) + '–' + clock(lesson.end)}${lesson.cancelled ? ', ' + this.t('Zrušeno', 'Cancelled') : ''}`}
       title=${lesson.title} @click=${() => { this.detail = lesson; }}>
       <span class="meta"><span>${lesson.allDay ? this.t('Celý den', 'All day') : `${clock(lesson.start)}–${clock(lesson.end)}`}</span><span>${lesson.location}</span></span>

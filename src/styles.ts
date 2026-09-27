@@ -32,7 +32,7 @@ export const styles = css`
   .today .day-label strong { color: var(--primary-color, #007b83); }
   .today { background: color-mix(in srgb, var(--primary-color, #007b83) 5%, transparent); }
   .track { position: relative; min-height: 94px; background: repeating-linear-gradient(to right, var(--divider-color, #e7edf0) 0 1px, transparent 1px var(--hour-width)); }
-  .lesson { position: absolute; top: calc(7px + var(--lane) * 86px); left: var(--left); width: var(--width); height: 77px; padding: 8px; text-align: left; border: 1px solid hsl(var(--hue) 35% 72%); border-left: 3px solid hsl(var(--hue) 45% 42%); border-radius: 7px; overflow: hidden; background: hsl(var(--hue) 60% 90%); color: #182635; display: flex; flex-direction: column; gap: 3px; }
+  .lesson { position: absolute; top: calc(7px + var(--lane) * 86px); left: var(--left); width: var(--width); height: 77px; padding: 8px; text-align: left; border: 1px solid var(--lesson-border); border-left: 3px solid var(--lesson-accent); border-radius: 7px; overflow: hidden; background: var(--lesson-bg); color: var(--lesson-text); display: flex; flex-direction: column; gap: 3px; }
   .lesson:hover { filter: brightness(.96); }
   .lesson .meta { display: flex; justify-content: space-between; gap: 5px; font-size: 10px; white-space: nowrap; }
   .lesson strong { font-size: 12px; line-height: 1.2; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }

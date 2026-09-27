@@ -24,6 +24,7 @@ export interface TimetableConfig {
   show_weekend?: boolean;
   available_days?: number;
   subject_labels?: Record<string, string>;
+  subject_colors?: Record<string, string>;
 }
 
 export interface Lesson {
