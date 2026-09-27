@@ -2,6 +2,8 @@
 
 School timetable cards for a family Home Assistant dashboard. The first card, `edupage-timetable-card`, shows the week on a wide screen and a selectable daily list on phones.
 
+![Weekly timetable with synthetic demonstration data](docs/timetable-demo.png)
+
 ## Status
 
 First release, tested in Home Assistant with two EduPage calendars. The repository supports installation through HACS as a custom repository. Inclusion in the default HACS catalog is requested separately.
