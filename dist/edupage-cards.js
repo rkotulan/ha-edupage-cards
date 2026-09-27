@@ -657,7 +657,7 @@ var we = class {
   button:focus-visible, summary:focus-visible { outline: 2px solid var(--primary-color, #007b83); outline-offset: 3px; }
   button:disabled { opacity: .35; cursor: default; }
   .card-title { padding: 22px 24px 0; overflow-wrap: anywhere; }
-  .student-row { display: flex; justify-content: flex-end; padding: 0 24px 14px; min-width: 0; }
+  .student-row { display: flex; justify-content: flex-end; min-width: 0; }
   .eyebrow { font-size: 10px; letter-spacing: .16em; font-weight: 700; color: var(--secondary-text-color, #687987); margin-bottom: 5px; }
   h2 { font-size: 23px; letter-spacing: -.03em; line-height: 1.2; margin: 0; font-weight: 650; }
   .student-picker { position: relative; max-width: 100%; font-size: 14px; }
@@ -675,7 +675,9 @@ var we = class {
   .student-option:hover { background: var(--secondary-background-color, #f6f8fa); }
   .student-option[aria-pressed=true] { background: color-mix(in srgb, var(--primary-color, #007b83) 12%, transparent); font-weight: 600; }
   .student-check { margin-left: auto; min-width: 18px; color: var(--primary-color, #007b83); }
-  .toolbar { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 18px 24px 12px; }
+  .toolbar { display: grid; grid-template-columns: auto auto minmax(0, 1fr); align-items: center; gap: 12px; padding: 18px 24px 16px; }
+  .period-controls { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .refresh { flex-shrink: 0; }
   .navigation { display: flex; align-items: center; gap: 7px; }
   .tool { border: 1px solid var(--divider-color, #d9e1e6); background: transparent; border-radius: 9px; padding: 7px 12px; min-height: 36px; }
   .arrow { font-size: 19px; line-height: 20px; }
@@ -733,17 +735,13 @@ var we = class {
   .mobile .lesson .teacher, .mobile .lesson .meta { font-size: 12px; }
   @container (max-width: 680px) {
     .card-title { padding: 18px 16px 0; }
-    .student-row { padding: 0 16px 12px; }
     h2 { font-size: 21px; }
-    .toolbar { padding: 16px 16px 12px; gap: 10px; }
+    .toolbar { padding: 16px; gap: 10px; grid-template-columns: auto minmax(0, 1fr); }
+    .student-row { grid-row: 1; grid-column: 2; }
+    .period-controls { grid-row: 2; grid-column: 1 / -1; }
     .desktop { display: none; }
     .mobile { display: block; }
     footer { padding: 12px 16px 16px; }
-  }
-  @container (max-width: 460px) {
-    .toolbar { grid-template-columns: 1fr auto; }
-    .range { grid-row: 2; grid-column: 1 / -1; }
-    .refresh { grid-row: 1; grid-column: 2; }
   }
 `;
 //#endregion
@@ -906,11 +904,11 @@ var Oe = class extends J {
 			this.week = "", this.detail = void 0;
 		}}>${this.t("Dnes", "Today")}</button>
           <button class="tool arrow" aria-label=${this.t("Další týden", "Next week")} ?disabled=${X(this.week, 7) > t} @click=${() => this.move(1)}>›</button></div>
-        <span class="range">${this.format(this.week)} – ${this.format(X(this.week, a - 1))} <span class="muted">${this.week.slice(0, 4)}</span></span>
+        <div class="period-controls"><span class="range">${this.format(this.week)} – ${this.format(X(this.week, a - 1))} <span class="muted">${this.week.slice(0, 4)}</span></span>
         <button class="tool refresh" aria-label=${this.t("Obnovit rozvrh", "Refresh timetable")} @click=${() => {
 			this.detail = void 0, this.calendar.refresh();
 		}}>↻</button>
-      </div>
+        </div>
       <div class="student-row">
         ${n.length > 1 ? L`<details class="student-picker" @keydown=${this.studentKeys}
           @focusout=${(e) => {
@@ -932,6 +930,7 @@ var Oe = class extends J {
             </button>`)}
           </div>
         </details>` : L`<span class="badge">${r.name ?? this.hass.states[r.entity]?.attributes.friendly_name ?? r.entity}</span>`}
+      </div>
       </div>
       ${this.calendar.loading ? L`<div class="message" role="status">${this.t("Načítám rozvrh…", "Loading timetable…")}</div>` : this.calendar.error ? L`<div class="message" role="alert">${this.t("Rozvrh se nepodařilo načíst. Zkontrolujte dostupnost kalendáře v HA.", "Could not load the timetable. Check that the calendar is available in HA.")}<br><button class="tool" @click=${() => void this.calendar.refresh()}>${this.t("Zkusit znovu", "Try again")}</button></div>` : L`<div class="desktop"><div class="grid">
           <div class="axis">${d.map((e) => L`<span class="tick" style=${`left:${(e - l) / (u - l) * 100}%`}>${Q(e)}</span>`)}</div>
