@@ -777,8 +777,142 @@ function De(e, t) {
 	};
 }
 //#endregion
-//#region src/index.ts
+//#region src/editor.ts
 var Oe = class extends J {
+	constructor(...e) {
+		super(...e), this.colorName = "", this.colorValue = "#90caf9";
+	}
+	static {
+		this.properties = {
+			hass: { attribute: !1 },
+			config: { state: !0 },
+			colorName: { state: !0 },
+			colorValue: { state: !0 }
+		};
+	}
+	static {
+		this.styles = o`
+    :host { display:block; color:var(--primary-text-color); }
+    * { box-sizing:border-box; }
+    fieldset { border:1px solid var(--divider-color,#ccc); border-radius:12px; margin:0 0 18px; padding:16px; min-width:0; }
+    legend { font-weight:600; padding:0 6px; }
+    label { display:flex; flex-direction:column; gap:6px; font-size:14px; margin-bottom:12px; min-width:0; }
+    input,select,button { font:inherit; color:inherit; }
+    input:not([type=checkbox]),select { width:100%; min-width:0; min-height:40px; padding:8px; border:1px solid var(--divider-color,#aaa); border-radius:8px; background:var(--card-background-color,#fff); }
+    input[type=color] { width:60px; padding:4px; }
+    button { padding:8px 12px; min-height:40px; border:1px solid var(--divider-color,#aaa); border-radius:8px; background:var(--secondary-background-color,#eee); cursor:pointer; }
+    button:disabled { opacity:.4; cursor:default; }
+    input:focus-visible,select:focus-visible,button:focus-visible { outline:2px solid var(--primary-color); outline-offset:2px; }
+    .toggle { flex-direction:row; align-items:center; gap:10px; }
+    .toggle input { width:18px; height:18px; }
+    .student { border-bottom:1px solid var(--divider-color,#ccc); margin-bottom:12px; padding-bottom:12px; }
+    .actions,.color { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
+    .color span { flex:1; overflow-wrap:anywhere; min-width:80px; }
+    p { font-size:13px; color:var(--secondary-text-color); line-height:1.5; }
+    .new-color { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; align-items:end; }
+  `;
+	}
+	setConfig(e) {
+		this.config = { ...e };
+	}
+	t(e, t) {
+		return (this.config?.language ?? this.hass?.language ?? "en").startsWith("cs") ? e : t;
+	}
+	updateConfig(e) {
+		let t = {
+			...this.config,
+			...e
+		};
+		for (let e of Object.keys(t)) t[e] === void 0 && delete t[e];
+		this.config = t, this.dispatchEvent(new CustomEvent("config-changed", {
+			detail: { config: t },
+			bubbles: !0,
+			composed: !0
+		}));
+	}
+	get people() {
+		return this.config?.students ?? (this.config?.entity ? [{ entity: this.config.entity }] : []);
+	}
+	savePeople(e) {
+		this.updateConfig({
+			students: e,
+			entity: void 0
+		});
+	}
+	editStudent(e, t) {
+		this.savePeople(this.people.map((n, r) => r === e ? {
+			...n,
+			...t
+		} : n));
+	}
+	moveStudent(e, t) {
+		let n = [...this.people];
+		[n[e], n[e + t]] = [n[e + t], n[e]], this.savePeople(n);
+	}
+	color(e, t) {
+		let n = { ...this.config?.subject_colors };
+		t === void 0 ? delete n[e] : Object.defineProperty(n, e, {
+			value: t,
+			enumerable: !0,
+			configurable: !0,
+			writable: !0
+		}), this.updateConfig({ subject_colors: Object.keys(n).length ? n : void 0 });
+	}
+	hex(e) {
+		return e.length === 4 ? "#" + e.slice(1).split("").map((e) => e + e).join("") : e;
+	}
+	render() {
+		if (!this.config || !this.hass) return z;
+		let e = Object.keys(this.hass.states).filter((e) => e.startsWith("calendar.")).sort(), t = this.people, n = e.find((e) => !t.some((t) => t.entity === e)), r = (e, t, n = !1) => L`<label class="toggle"><input type="checkbox" .checked=${this.config[e] ?? n} @change=${(t) => this.updateConfig({ [e]: t.target.checked })}>${t}</label>`;
+		return L`
+      <fieldset><legend>${this.t("Žáci a kalendáře", "Students and calendars")}</legend>
+        <p>${this.t("První žák se zobrazí po otevření karty. Jméno můžete ponechat prázdné a použít název kalendáře.", "The first student is selected when the card opens. Leave the name blank to use the calendar name.")}</p>
+        ${t.map((n, r) => L`<div class="student">
+          <label>${this.t("Kalendář", "Calendar")} ${r + 1}<select .value=${n.entity} @change=${(e) => this.editStudent(r, { entity: e.target.value })}>
+            ${e.includes(n.entity) ? z : L`<option value=${n.entity}>${n.entity} (${this.t("nedostupný", "unavailable")})</option>`}
+            ${e.map((e) => L`<option value=${e} ?selected=${e === n.entity}>${this.hass.states[e].attributes.friendly_name ?? e} · ${e}</option>`)}
+          </select></label>
+          <label>${this.t("Jméno žáka", "Student name")} ${r + 1}<input .value=${n.name ?? ""} @input=${(e) => this.editStudent(r, { name: e.target.value || void 0 })}></label>
+          <div class="actions"><button ?disabled=${r === 0} aria-label=${this.t("Posunout žáka nahoru", "Move student up")} @click=${() => this.moveStudent(r, -1)}>↑</button><button ?disabled=${r === t.length - 1} aria-label=${this.t("Posunout žáka dolů", "Move student down")} @click=${() => this.moveStudent(r, 1)}>↓</button><button ?disabled=${t.length <= 1} @click=${() => this.savePeople(t.filter((e, t) => t !== r))}>${this.t("Odebrat žáka", "Remove student")}</button></div>
+        </div>`)}
+        <button ?disabled=${!n} @click=${() => {
+			n && this.savePeople([...t, { entity: n }]);
+		}}>${this.t("Přidat žáka", "Add student")}</button>
+        ${e.length ? z : L`<p>${this.t("V HA nejsou dostupné žádné kalendáře.", "No calendars are available in HA.")}</p>`}
+      </fieldset>
+      <fieldset><legend>${this.t("Zobrazení", "Display")}</legend>
+        ${r("show_student", this.t("Zobrazit jméno a výběr žáka", "Show student name and picker"), !0)}
+        ${this.config.show_student === !1 ? L`<p>${this.t("Zobrazuje se první žák ze seznamu.", "The first student in the list is displayed.")}</p>` : z}
+        ${r("show_title", this.t("Zobrazit nadpis", "Show title"))}
+        ${this.config.show_title ? L`<label>${this.t("Nadpis", "Title")}<input .value=${this.config.title ?? ""} @input=${(e) => this.updateConfig({ title: e.target.value || void 0 })}></label>` : z}
+        ${r("show_weekend", this.t("Zobrazit víkendy", "Show weekends"))}
+        <label>${this.t("Jazyk", "Language")}<select .value=${this.config.language ?? ""} @change=${(e) => this.updateConfig({ language: e.target.value || void 0 })}>
+          <option value="" ?selected=${!this.config.language}>${this.t("Podle Home Assistantu", "Use Home Assistant language")}</option><option value="cs" ?selected=${this.config.language === "cs"}>Čeština</option><option value="en" ?selected=${this.config.language === "en"}>English</option>
+        </select></label>
+      </fieldset>
+      <fieldset><legend>${this.t("Barvy předmětů", "Subject colors")}</legend>
+        <p>${this.t("Barvy se vybírají automaticky. Vlastní barvu přiřaďte přesnému celému názvu předmětu.", "Colors are automatic. Assign an override using the exact full subject name.")}</p>
+        ${Object.entries(this.config.subject_colors ?? {}).map(([e, t]) => L`<div class="color"><span>${e}</span><input type="color" aria-label=${this.t("Barva: ", "Color: ") + e} .value=${this.hex(t)} @input=${(t) => this.color(e, t.target.value)}><button aria-label=${this.t("Obnovit automatickou barvu: ", "Restore automatic color: ") + e} @click=${() => this.color(e)}>${this.t("Automaticky", "Automatic")}</button></div>`)}
+        <div class="new-color"><label>${this.t("Název předmětu", "Subject name")}<input .value=${this.colorName} @input=${(e) => {
+			this.colorName = e.target.value;
+		}}></label><label>${this.t("Barva", "Color")}<input type="color" .value=${this.colorValue} @input=${(e) => {
+			this.colorValue = e.target.value;
+		}}></label></div>
+        <button ?disabled=${!this.colorName.trim()} @click=${() => {
+			this.color(this.colorName.trim(), this.colorValue), this.colorName = "";
+		}}>${this.t("Nastavit barvu", "Set color")}</button>
+      </fieldset>
+      <details><summary>${this.t("Pokročilé", "Advanced")}</summary><p>${this.t("Dostupný rozsah nezvětšuje historii načítanou konektorem.", "The available range does not extend the history fetched by the integration.")}</p><label>${this.t("Počet dostupných dnů", "Available days")}<input type="number" min="1" max="366" .value=${String(this.config.available_days ?? 14)} @change=${(e) => {
+			let t = e.target, n = Number(t.value);
+			t.value && Number.isInteger(n) && n >= 1 && n <= 366 ? this.updateConfig({ available_days: n }) : t.value = String(this.config.available_days ?? 14);
+		}}></label></details>
+    `;
+	}
+};
+customElements.get("edupage-timetable-editor") || customElements.define("edupage-timetable-editor", Oe);
+//#endregion
+//#region src/index.ts
+var ke = class extends J {
 	constructor(...e) {
 		super(...e), this.week = "", this.studentIndex = 0, this.selectedDay = 0, this.now = /* @__PURE__ */ new Date(), this.calendar = new we(this), this.detailPointerOutside = !1, this.dismissStudentPicker = (e) => {
 			let t = this.renderRoot.querySelector(".student-picker");
@@ -834,6 +968,9 @@ var Oe = class extends J {
 	}
 	getCardSize() {
 		return 8;
+	}
+	static getConfigElement() {
+		return document.createElement("edupage-timetable-editor");
 	}
 	getGridOptions() {
 		return {
@@ -983,13 +1120,13 @@ var Oe = class extends J {
     </ha-card>`;
 	}
 };
-customElements.get("edupage-timetable-card") || customElements.define("edupage-timetable-card", Oe);
-var ke = window;
-ke.customCards ??= [], ke.customCards.push({
+customElements.get("edupage-timetable-card") || customElements.define("edupage-timetable-card", ke);
+var Ae = window;
+Ae.customCards ??= [], Ae.customCards.push({
 	type: "edupage-timetable-card",
 	name: "EduPage Timetable",
 	description: "A weekly school timetable with a mobile daily view.",
 	preview: !0
 });
 //#endregion
-export { Oe as EdupageTimetableCard };
+export { ke as EdupageTimetableCard };

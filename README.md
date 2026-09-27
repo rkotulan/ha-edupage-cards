@@ -26,7 +26,7 @@ The integration currently caches today and the following 13 days. The card defau
 
 The current calendar does not expose lesson numbers, school-defined colors, groups, or detailed substitution metadata. This version uses actual lesson times and card-assigned colors. `[Canceled]` events are shown as cancelled. All-day calendar dates and the integration's 00:00–23:59 holidays are supported. Named events require the integration to provide their title.
 
-Configuration is YAML-only for now. Calendar data refreshes on entity changes, every five minutes, or via the refresh button. The refresh button rereads HA's cache; it does not force a new EduPage poll.
+A visual editor is available in Home Assistant: edit the dashboard, then edit this card. Configure students and their order, names, title visibility, student visibility, weekends, language, subject colors and the available date range. Changes appear in the preview before saving. YAML remains available for all options, including `subject_labels`. Calendar data refreshes on entity changes, every five minutes, or via the refresh button. The refresh button rereads HA's cache; it does not force a new EduPage poll.
 
 ## Install with HACS
 
@@ -88,7 +88,7 @@ subject_colors:
   Anglický jazyk: "#ffe082"
 ```
 
-Names match the original full subject title (with surrounding whitespace ignored), not `subject_labels`. The mapping applies to all configured students. Subjects without an override keep their automatic colors. Text switches between black and white for contrast; cancelled lessons retain their neutral appearance. Quote hex colors in YAML, otherwise `#` starts a comment. Color configuration is YAML-only in this version.
+Names match the original full subject title (with surrounding whitespace ignored), not `subject_labels`. The mapping applies to all configured students. Subjects without an override keep their automatic colors. Text switches between black and white for contrast; cancelled lessons retain their neutral appearance. Quote hex colors in YAML, otherwise `#` starts a comment. Colors can be configured in the visual editor or YAML. Use Automatic in the editor to remove an override.
 
 ## Development
 

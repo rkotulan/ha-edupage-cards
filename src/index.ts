@@ -5,6 +5,7 @@ import { addDays, axis, clock, dateKey, initialWeek, layout, minutes, normalize,
 import type { HomeAssistant, Lesson, TimetableConfig } from './types';
 import { styles } from './styles';
 import { lessonColors, validateColors } from './colors';
+import './editor';
 
 export class EdupageTimetableCard extends LitElement {
   static styles = styles;
@@ -81,6 +82,7 @@ export class EdupageTimetableCard extends LitElement {
   }
 
   getCardSize(): number { return 8; }
+  static getConfigElement(): HTMLElement { return document.createElement('edupage-timetable-editor'); }
   getGridOptions(): object { return { columns: 'full', rows: 'auto', min_columns: 6 }; }
 
   static getStubConfig(hass: HomeAssistant): TimetableConfig {
