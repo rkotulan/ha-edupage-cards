@@ -166,7 +166,7 @@ export class EdupageTimetableCard extends LitElement {
         <div class="period-controls"><span class="range">${this.format(this.week)} – ${this.format(addDays(this.week, count - 1))} <span class="muted">${this.week.slice(0, 4)}</span></span>
         <button class="tool refresh" aria-label=${this.t('Obnovit rozvrh', 'Refresh timetable')} @click=${() => { this.detail = undefined; void this.calendar.refresh(); }}>↻</button>
         </div>
-      <div class="student-row">
+      ${this.config.show_student !== false ? html`<div class="student-row">
         ${people.length > 1 ? html`<details class="student-picker" @keydown=${this.studentKeys}
           @focusout=${(e: FocusEvent) => { if (!(e.currentTarget as HTMLElement).contains(e.relatedTarget as Node | null)) this.closeStudentPicker(); }}>
           <summary aria-label=${`${this.t('Vybrat dítě', 'Choose student')}: ${studentName(this.studentIndex)}`}>
@@ -187,7 +187,7 @@ export class EdupageTimetableCard extends LitElement {
               <span class="student-avatar" aria-hidden="true">${studentName(this.studentIndex).trim().slice(0, 1).toLocaleUpperCase()}</span>
               <span class="student-name">${studentName(this.studentIndex)}</span>
             </div>`}
-      </div>
+      </div>` : nothing}
       </div>
       ${this.calendar.loading ? html`<div class="message" role="status">${this.t('Načítám rozvrh…', 'Loading timetable…')}</div>`
         : this.calendar.error ? html`<div class="message" role="alert">${this.t('Rozvrh se nepodařilo načíst. Zkontrolujte dostupnost kalendáře v HA.', 'Could not load the timetable. Check that the calendar is available in HA.')}<br><button class="tool" @click=${() => void this.calendar.refresh()}>${this.t('Zkusit znovu', 'Try again')}</button></div>`

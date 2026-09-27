@@ -910,7 +910,7 @@ var Oe = class extends J {
 			this.detail = void 0, this.calendar.refresh();
 		}}>↻</button>
         </div>
-      <div class="student-row">
+      ${this.config.show_student === !1 ? z : L`<div class="student-row">
         ${n.length > 1 ? L`<details class="student-picker" @keydown=${this.studentKeys}
           @focusout=${(e) => {
 			e.currentTarget.contains(e.relatedTarget) || this.closeStudentPicker();
@@ -934,7 +934,7 @@ var Oe = class extends J {
               <span class="student-avatar" aria-hidden="true">${r(this.studentIndex).trim().slice(0, 1).toLocaleUpperCase()}</span>
               <span class="student-name">${r(this.studentIndex)}</span>
             </div>`}
-      </div>
+      </div>`}
       </div>
       ${this.calendar.loading ? L`<div class="message" role="status">${this.t("Načítám rozvrh…", "Loading timetable…")}</div>` : this.calendar.error ? L`<div class="message" role="alert">${this.t("Rozvrh se nepodařilo načíst. Zkontrolujte dostupnost kalendáře v HA.", "Could not load the timetable. Check that the calendar is available in HA.")}<br><button class="tool" @click=${() => void this.calendar.refresh()}>${this.t("Zkusit znovu", "Try again")}</button></div>` : L`<div class="desktop"><div class="grid">
           <div class="axis">${u.map((e) => L`<span class="tick" style=${`left:${(e - c) / (l - c) * 100}%`}>${Q(e)}</span>`)}</div>
