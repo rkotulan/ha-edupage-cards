@@ -21,6 +21,34 @@ export class EdupageTimetableCard extends LitElement {
   private now = new Date();
   private timer?: ReturnType<typeof setInterval>;
   private calendar = new CalendarController(this);
+  private dismissStudentPicker = (event: Event): void => {
+    const picker = this.renderRoot.querySelector<HTMLDetailsElement>('.student-picker');
+    if (picker && !event.composedPath().includes(picker)) picker.open = false;
+  };
+
+  private closeStudentPicker(focus = false): void {
+    const picker = this.renderRoot.querySelector<HTMLDetailsElement>('.student-picker');
+    if (picker) {
+      picker.open = false;
+      if (focus) picker.querySelector('summary')?.focus();
+    }
+  }
+
+  private studentKeys(event: KeyboardEvent): void {
+    const picker = event.currentTarget as HTMLDetailsElement;
+    if (event.key === 'Escape') {
+      event.preventDefault(); event.stopPropagation(); this.closeStudentPicker(true);
+    } else if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+      event.preventDefault();
+      picker.open = true;
+      const items = [...picker.querySelectorAll<HTMLButtonElement>('.student-option')];
+      const index = items.indexOf(this.shadowRoot?.activeElement as HTMLButtonElement);
+      const next = event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1
+        : index < 0 ? (event.key === 'ArrowUp' ? items.length - 1 : 0)
+        : (index + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+      items[next]?.focus();
+    }
+  }
 
   setConfig(config: TimetableConfig): void {
     students(config);
@@ -41,11 +69,16 @@ export class EdupageTimetableCard extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
+    document.addEventListener('pointerdown', this.dismissStudentPicker);
     this.now = new Date();
     this.timer = setInterval(() => { this.now = new Date(); }, 30_000);
   }
 
-  disconnectedCallback(): void { super.disconnectedCallback(); clearInterval(this.timer); }
+  disconnectedCallback(): void {
+    super.disconnectedCallback(); clearInterval(this.timer);
+    document.removeEventListener('pointerdown', this.dismissStudentPicker);
+    this.closeStudentPicker();
+  }
 
   protected willUpdate(_changed: PropertyValues): void {
     if (!this.hass || !this.config) return;
@@ -92,6 +125,7 @@ export class EdupageTimetableCard extends LitElement {
     const lastDay = addDays(today, (this.config.available_days ?? 14) - 1);
     const people = students(this.config);
     const chosen = people[this.studentIndex];
+    const studentName = (index: number) => String(people[index].name ?? this.hass!.states[people[index].entity]?.attributes.friendly_name ?? people[index].entity);
     const count = this.config.show_weekend ? 7 : 5;
     const days = Array.from({ length: count }, (_, i) => addDays(this.week, i));
     const available = (day: string) => day >= today && day <= lastDay;
@@ -104,8 +138,22 @@ export class EdupageTimetableCard extends LitElement {
     const dayLessons = (day: string) => lessons.filter(l => l.day === day);
     return html`<ha-card>
       <header><div><div class="eyebrow">EDUPAGE · ${this.t('ŠKOLNÍ PŘEHLED', 'SCHOOL OVERVIEW')}</div><h2>${this.config.title ?? this.t('Rozvrh', 'Timetable')}</h2></div>
-        ${people.length > 1 ? html`<select aria-label=${this.t('Dítě', 'Student')} .value=${String(this.studentIndex)} @change=${(e: Event) => { this.studentIndex = Number((e.target as HTMLSelectElement).value); this.detail = undefined; }}>
-          ${people.map((s, i) => html`<option value=${i}>${s.name ?? this.hass!.states[s.entity]?.attributes.friendly_name ?? s.entity}</option>`)}</select>`
+        ${people.length > 1 ? html`<details class="student-picker" @keydown=${this.studentKeys}
+          @focusout=${(e: FocusEvent) => { if (!(e.currentTarget as HTMLElement).contains(e.relatedTarget as Node | null)) this.closeStudentPicker(); }}>
+          <summary aria-label=${`${this.t('Vybrat dítě', 'Choose student')}: ${studentName(this.studentIndex)}`}>
+            <span class="student-avatar" aria-hidden="true">${studentName(this.studentIndex).trim().slice(0, 1).toLocaleUpperCase()}</span>
+            <span class="student-name">${studentName(this.studentIndex)}</span>
+            <svg class="student-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5" /></svg>
+          </summary>
+          <div class="student-options" role="group" aria-label=${this.t('Dítě', 'Student')}>
+            <span class="student-caption">${this.t('Zobrazit rozvrh', 'Show timetable')}</span>
+            ${people.map((_s, i) => html`<button class="student-option" aria-pressed=${i === this.studentIndex}
+              @click=${() => { this.studentIndex = i; this.detail = undefined; this.closeStudentPicker(true); }}>
+              <span class="student-avatar" aria-hidden="true">${studentName(i).trim().slice(0, 1).toLocaleUpperCase()}</span>
+              <span class="student-name">${studentName(i)}</span><span class="student-check" aria-hidden="true">${i === this.studentIndex ? '✓' : ''}</span>
+            </button>`)}
+          </div>
+        </details>`
           : html`<span class="badge">${chosen.name ?? this.hass.states[chosen.entity]?.attributes.friendly_name ?? chosen.entity}</span>`}
       </header>
       <div class="toolbar"><span class="range">${this.format(this.week)} – ${this.format(addDays(this.week, count - 1))} <span class="muted">${this.week.slice(0, 4)}</span></span>
