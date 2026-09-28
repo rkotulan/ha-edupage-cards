@@ -50,7 +50,7 @@ export class EdupageTimetableEditor extends LitElement {
     const calendars = Object.keys(this.hass.states).filter(id => id.startsWith('calendar.')).sort();
     const people = this.people;
     const unused = calendars.find(id => !people.some(s => s.entity === id));
-    const checkbox = (key: 'show_title'|'show_student'|'show_weekend', label: string, fallback = false) => html`<label class="toggle"><input type="checkbox" .checked=${this.config![key] ?? fallback} @change=${(e: Event) => this.updateConfig({ [key]: (e.target as HTMLInputElement).checked })}>${label}</label>`;
+    const checkbox = (key: 'show_title'|'show_student'|'show_weekend'|'compact', label: string, fallback = false) => html`<label class="toggle"><input type="checkbox" .checked=${this.config![key] ?? fallback} @change=${(e: Event) => this.updateConfig({ [key]: (e.target as HTMLInputElement).checked })}>${label}</label>`;
     return html`
       <fieldset><legend>${this.t('Žáci a kalendáře','Students and calendars')}</legend>
         <p>${this.t('První žák se zobrazí po otevření karty. Jméno můžete ponechat prázdné a použít název kalendáře.','The first student is selected when the card opens. Leave the name blank to use the calendar name.')}</p>
@@ -68,6 +68,7 @@ export class EdupageTimetableEditor extends LitElement {
       <fieldset><legend>${this.t('Zobrazení','Display')}</legend>
         ${checkbox('show_student',this.t('Zobrazit jméno a výběr žáka','Show student name and picker'),true)}
         ${this.config.show_student===false ? html`<p>${this.t('Zobrazuje se první žák ze seznamu.','The first student in the list is displayed.')}</p>` : nothing}
+        ${checkbox('compact',this.t('Kompaktní přehled','Compact overview'))}
         ${checkbox('show_title',this.t('Zobrazit nadpis','Show title'))}
         ${this.config.show_title ? html`<label>${this.t('Nadpis','Title')}<input .value=${this.config.title ?? ''} @input=${(e: Event)=>this.updateConfig({title:(e.target as HTMLInputElement).value || undefined})}></label>` : nothing}
         ${checkbox('show_weekend',this.t('Zobrazit víkendy','Show weekends'))}

@@ -154,6 +154,31 @@ The card shows all assessments exposed by the selected sensors, not an unread co
 
 ## Family dashboard
 
+### Compact family overview (development)
+
+The timetable, messages and grades cards accept `compact: true` (also available in their visual editors). Timetables use the daily view, messages use one-line previews, and grades show the three latest assessments. Full detail dialogs remain available. Informational footnotes collapse under **Information**, while unavailable and stale-data warnings stay visible.
+
+For messages, set `max_messages: 2`. Messages and grades accept `more_path`, a local Home Assistant path to a full-list subview, for example `/school/messages-student`. Create that subview separately with `compact: false`; the link does not create a view or change the student automatically.
+
+Use `custom:edupage-overview-card` at the top of each child's section for an initial avatar, latest attendance record and assignment summary. Its visual editor supports these settings:
+
+```yaml
+type: custom:edupage-overview-card
+name: Student
+accent: blue # blue, green or violet
+notifications: sensor.student_notifications
+open_homework: sensor.student_open_homework
+overdue_homework: sensor.student_overdue_homework
+upcoming_exams: sensor.student_upcoming_exams
+next_deadline: sensor.student_next_homework_deadline
+duties_path: /school/assignments-student
+language: en
+```
+
+Choose the actual entities from your integration. Counts of zero are distinct from unavailable values. Attendance uses the newest `pipnutie` event, preserves arrivals and departures, and never claims current presence. Missing attendance records can mean incomplete history. Omit the grades card for schools without grades. The cards follow Home Assistant's theme; Sections stack each child's cards on mobile.
+
+### Standard layout
+
 Create a Sections view with one section per child. Give each card a single student and set `show_student: false` to avoid repeating a selector below the section heading. Sections appear side by side on wider screens and stack on mobile. A timetable inside a narrow section uses its daily layout. Omit the grades card for children whose school does not use grades.
 
 This example is one section; duplicate it with different entities for other children:

@@ -9,6 +9,7 @@ import './editor';
 import './student-picker';
 import './messages-card';
 import './grades-card';
+import './overview-card';
 
 export class EdupageTimetableCard extends LitElement {
   static styles = styles;
@@ -130,7 +131,7 @@ export class EdupageTimetableCard extends LitElement {
       ? this.t('Kalendář nevrátil žádné události.', 'The calendar returned no events.')
       : this.t('Mimo dostupný rozsah konektoru.', 'Outside the integration’s available range.');
     const dayLessons = (day: string) => lessons.filter(l => l.day === day);
-    return html`<ha-card>
+    return html`<ha-card class=${this.config.compact ? "compact timetable-compact" : ""}>
       ${this.config.show_title ? html`<h2 class="card-title">${this.config.title ?? this.t('Rozvrh', 'Timetable')}</h2>` : nothing}
       <div class="toolbar">
         <div class="navigation"><button class="tool arrow" aria-label=${this.t('Předchozí týden', 'Previous week')} ?disabled=${addDays(this.week, count - 8) < today} @click=${() => this.move(-1)}>‹</button>
@@ -173,8 +174,8 @@ export class EdupageTimetableCard extends LitElement {
         ${this.detail.location ? html`<p>${this.t('Učebna', 'Room')}: ${this.detail.location}</p>` : nothing}
         ${this.detail.description && !this.detail.description.startsWith('Teacher(s):') ? html`<p>${this.detail.description}</p>` : nothing}
       </dialog>` : nothing}
-      <footer>${this.t('Dostupný rozsah', 'Available range')}: ${this.format(today)} – ${this.format(lastDay)}. ${this.t('Prázdný den nemusí znamenat volno.', 'An empty day does not necessarily mean no school.')}
-        ${this.calendar.updated ? html`<br>${this.t('Načteno', 'Loaded')} ${new Intl.DateTimeFormat(this.cs ? 'cs' : 'en', { timeZone: this.hass.config.time_zone, hour: '2-digit', minute: '2-digit' }).format(this.calendar.updated)}` : nothing}</footer>
+      <footer><details ?open=${!this.config.compact}><summary>${this.t('Informace','Information')}</summary>${this.t('Dostupný rozsah', 'Available range')}: ${this.format(today)} – ${this.format(lastDay)}. ${this.t('Prázdný den nemusí znamenat volno.', 'An empty day does not necessarily mean no school.')}
+        ${this.calendar.updated ? html`<br>${this.t('Načteno', 'Loaded')} ${new Intl.DateTimeFormat(this.cs ? 'cs' : 'en', { timeZone: this.hass.config.time_zone, hour: '2-digit', minute: '2-digit' }).format(this.calendar.updated)}` : nothing}</details></footer>
     </ha-card>`;
   }
 }

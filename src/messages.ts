@@ -6,6 +6,8 @@ export interface MessagesConfig {
   students?: Student[];
   title?: string;
   show_student?: boolean;
+  compact?: boolean;
+  more_path?: string;
   language?: 'cs' | 'en';
   max_messages?: number;
 }

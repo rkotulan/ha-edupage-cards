@@ -3,6 +3,7 @@ import type { HomeAssistant } from './types';
 import { gradeData, validateGrades, discoverGradeStudents } from './grades';
 import type { Grade, GradesConfig } from './grades';
 import { messageDate } from './messages';
+import { localPath } from './overview';
 import { styles } from './styles';
 import './student-picker';
 import './grades-editor';
@@ -52,13 +53,13 @@ export class EdupageGradesCard extends LitElement {
     const people=this.config.students,person=people[this.studentIndex],data=gradeData(person,this.hass.states);
     const groups=[...new Set(data.grades.map(g=>g.subject))].sort((a,b)=>a.localeCompare(b,this.config!.language ?? this.hass!.language));
     const g=this.detail;
-    return html`<ha-card><div class="head"><h2>${this.config.title ?? this.t('Známky','Grades')}</h2>
+    return html`<ha-card class=${this.config.compact ? "compact grades-compact" : ""}><div class="head"><h2>${this.config.title ?? this.t('Známky','Grades')}</h2>
       ${this.config.show_student===false ? nothing : html`<edupage-student-picker .names=${people.map(p=>p.name)} .selected=${this.studentIndex} .language=${this.config.language ?? this.hass.language} @student-changed=${(e:CustomEvent<{index:number}>)=>{this.close();this.studentIndex=e.detail.index;}}></edupage-student-picker>`}</div>
       <div class="views" role="group" aria-label=${this.t('Zobrazení známek','Grade view')}><button class="tool" aria-pressed=${this.view==='latest'} @click=${()=>this.view='latest'}>${this.t('Nejnovější','Latest')}</button><button class="tool" aria-pressed=${this.view==='subjects'} @click=${()=>this.view='subjects'}>${this.t('Podle předmětů','By subject')}</button></div>
       ${data.unavailable.length ? html`<div class="notice" role="alert">${this.t('Nedostupné senzory','Unavailable sensors')}: ${data.unavailable.join(', ')}</div>` : nothing}
       ${data.unsupported.length ? html`<div class="notice" role="alert">${this.t('Senzory neposkytují známky','Sensors do not provide grades')}: ${data.unsupported.join(', ')}</div>` : nothing}
       ${data.stale ? html`<div class="notice" role="status">${this.t('Údaje mohou být zastaralé.','Data may be stale.')}</div>` : nothing}
-      <div class="list">${data.grades.length ? this.view==='latest' ? data.grades.map(g=>this.row(g)) : groups.map(subject=>html`<h3 class="subject">${subject}</h3>${data.grades.filter(g=>g.subject===subject).map(g=>this.row(g))}`) : html`<div class="empty">${this.t('V dostupných datech nejsou žádné známky.','No grades in the available data.')}</div>`}</div>
+      <div class="list">${data.grades.length ? this.config.compact || this.view==='latest' ? data.grades.slice(0,this.config.compact ? 3 : undefined).map(g=>this.row(g)) : groups.map(subject=>html`<h3 class="subject">${subject}</h3>${data.grades.filter(g=>g.subject===subject).map(g=>this.row(g))}`) : html`<div class="empty">${this.t('V dostupných datech nejsou žádné známky.','No grades in the available data.')}</div>`}</div>
       ${g ? html`<dialog class="detail" aria-labelledby="grade-title" @cancel=${(e:Event)=>{e.preventDefault();e.stopPropagation();this.close();}} @close=${()=>this.detail=undefined} @pointerdown=${(e:PointerEvent)=>this.pointerOutside=this.outside(e)} @click=${(e:MouseEvent)=>{if(this.pointerOutside&&this.outside(e))this.close();}}>
         <div class="detail-head"><div><div class="eyebrow">${person.name} · ${g.subject}</div><h3 id="grade-title">${g.title || this.t('Hodnocení','Assessment')}</h3></div><button class="tool detail-close" autofocus aria-label=${this.t('Zavřít detail','Close details')} @click=${this.close}>×</button></div>
         <span class="value">${g.value || '—'}</span><p>${this.date(g.date)}</p>
@@ -68,7 +69,7 @@ export class EdupageGradesCard extends LitElement {
         ${g.maxPoints!=='' ? html`<p>${this.t('Maximum bodů','Maximum points')}: ${g.maxPoints}</p>` : nothing}
         ${g.classAverage!=='' ? html`<p>${this.t('Průměr třídy','Class average')}: ${g.classAverage}</p>` : nothing}
       </dialog>` : nothing}
-      <footer>${this.t('Zobrazeno','Showing')} ${data.grades.length} ${this.t('hodnocení z vybraných senzorů. Váhy známek nejsou dostupné; průměr žáka nepočítáme.','assessments from selected sensors. Weights are unavailable; no student average is calculated.')}</footer>
+      <footer>${localPath(this.config.more_path) ? html`<a class="more" href=${localPath(this.config.more_path)!}>${this.t('Všechna hodnocení','All assessments')} →</a>` : nothing}<details ?open=${!this.config.compact}><summary>${this.t('Informace','Information')}</summary>${this.t('Dostupných','Available')} ${data.grades.length} ${this.t('hodnocení z vybraných senzorů. Váhy známek nejsou dostupné; průměr žáka nepočítáme.','assessments from selected sensors. Weights are unavailable; no student average is calculated.')}</details></footer>
     </ha-card>`;
   }
 }

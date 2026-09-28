@@ -6,6 +6,8 @@ export interface GradesConfig {
   students: GradeStudent[];
   title?: string;
   show_student?: boolean;
+  compact?: boolean;
+  more_path?: string;
   language?: 'cs' | 'en';
   default_view?: 'latest' | 'subjects';
 }

@@ -3,6 +3,7 @@ import { keyed } from 'lit/directives/keyed.js';
 import type { HomeAssistant } from './types';
 import { messageData, messageDate, messageStudents } from './messages';
 import type { MessagesConfig, SchoolMessage } from './messages';
+import { localPath } from './overview';
 import { styles } from './styles';
 import './messages-editor';
 import './student-picker';
@@ -64,7 +65,7 @@ export class EdupageMessagesCard extends LitElement {
     const name=(i:number)=>String(people[i].name ?? this.hass!.states[people[i].entity]?.attributes.student ?? this.hass!.states[people[i].entity]?.attributes.friendly_name ?? people[i].entity);
     const data=messageData(this.hass.states[person.entity]);
     const messages=data.messages.slice(0,this.config.max_messages ?? 10);
-    return html`<ha-card>
+    return html`<ha-card class=${this.config.compact ? "compact messages-compact" : ""}>
       <div class="messages-head"><h2>${this.config.title ?? this.t('Zprávy ze školy','School messages')}</h2>
         ${this.config.show_student===false ? nothing : html`<edupage-student-picker
           .names=${people.map((_,i)=>name(i))} .selected=${this.studentIndex} .language=${this.config.language ?? this.hass.language}
@@ -90,8 +91,8 @@ export class EdupageMessagesCard extends LitElement {
         <div class="message-meta">${messageDate(this.detail.timestamp,this.config.language ?? this.hass.language) || this.t('Datum neuvedeno','Date unavailable')}</div>
         <div class="message-body">${this.detail.text || this.t('Text zprávy není dostupný.','Message text is unavailable.')}</div>
       </dialog>` : nothing}
-      <footer>${data.truncated && !data.unavailable && !data.unsupported ? html`<div>${this.t('Konektor poskytuje jen část historie. Starší zprávy zde mohou chybět.','The integration provides only part of the history. Older messages may be missing.')}</div>` : nothing}
-        <div>${this.t('Zobrazení zprávy zde nemění stav přečtení v EduPage.','Viewing a message here does not mark it as read in EduPage.')}</div></footer>
+      <footer>${localPath(this.config.more_path) ? html`<a class="more" href=${localPath(this.config.more_path)!}>${this.t('Všechny zprávy','All messages')} →</a>` : nothing}<details ?open=${!this.config.compact}><summary>${this.t('Informace','Information')}</summary>${data.truncated && !data.unavailable && !data.unsupported ? html`<div>${this.t('Konektor poskytuje jen část historie. Starší zprávy zde mohou chybět.','The integration provides only part of the history. Older messages may be missing.')}</div>` : nothing}
+        <div>${this.t('Zobrazení zprávy zde nemění stav přečtení v EduPage.','Viewing a message here does not mark it as read in EduPage.')}</div></details></footer>
     </ha-card>`;
   }
 }

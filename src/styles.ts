@@ -79,4 +79,40 @@ export const styles = css`
     .mobile { display: block; }
     footer { padding: 12px 16px 16px; }
   }
+  .compact h2 { font-size:18px; letter-spacing:0; }
+  .compact .messages-head, .compact .head { padding:18px 20px 10px; }
+  .compact .message-count, .compact .message-action, .compact .views { display:none; }
+  .compact .messages-list, .compact .list { padding:0 20px 10px; }
+  .compact .school-message { border:0; border-radius:0; border-bottom:1px solid var(--divider-color); margin:0; padding:12px 0; }
+  .compact .message-preview { -webkit-line-clamp:1; font-size:13px; margin-top:5px; }
+  .compact .message-meta { font-size:11px; }
+  .compact .grade { padding:8px 0; margin:0; border:0; border-bottom:1px solid var(--divider-color); border-radius:0; }
+  .compact .value { font-size:17px; min-width:36px; padding:7px; }
+  .compact .info .title { -webkit-line-clamp:1; }
+  .compact footer { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; padding:10px 20px; }
+  .compact .more { font-size:12px; color:var(--primary-color); text-decoration:none; }
+  footer summary { cursor:pointer; }
+  footer details:not([open]) { margin-left:auto; }
+  footer details[open] { flex-basis:100%; }
+  footer details[open] summary { margin-bottom:6px; }
+  footer details[open] summary { display:none; }
+  .compact footer details[open] summary { display:list-item; }
+  ha-card.messages-compact { min-height:250px; display:flex; flex-direction:column; }
+  .messages-compact footer { margin-top:auto; }
+  .timetable-compact .card-title { padding:18px 20px 0; }
+  .timetable-compact .toolbar { padding:12px 20px; grid-template-columns:minmax(0,1fr) auto; gap:8px; }
+  .timetable-compact .period-controls { grid-row:1; grid-column:1; gap:6px; }
+  .timetable-compact .navigation { grid-row:1; grid-column:2; gap:4px; }
+  .timetable-compact .student-row { grid-row:2; grid-column:1 / -1; }
+  .timetable-compact .range { font-size:12px; }
+  .timetable-compact .tool { padding:5px 9px; min-height:34px; }
+  .timetable-compact .mobile { display:block; padding:0 20px 12px; }
+  .timetable-compact .desktop { display:none; }
+  .timetable-compact .days { margin-bottom:10px; }
+  .timetable-compact .days button { padding:7px 3px; }
+  .timetable-compact .mobile .lesson { min-height:84px; }
+  @container(max-width:360px) {
+    .timetable-compact .navigation { grid-row:2; grid-column:1 / -1; }
+    .timetable-compact .student-row { grid-row:3; }
+  }
 `;

@@ -22,6 +22,8 @@ export interface TimetableConfig {
   title?: string;
   show_title?: boolean;
   show_student?: boolean;
+  compact?: boolean;
+  more_path?: string;
   language?: 'cs' | 'en';
   show_weekend?: boolean;
   available_days?: number;
